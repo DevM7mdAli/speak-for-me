@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Speak For Me"
+  },
+  "home": {
+    "callNurse": "Call the nurse",
+    "typeMessage": "Type a message",
+    "myPhrases": "My phrases"
+  },
+  "common": {
+    "back": "Back",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "speak": "Speak",
+    "loading": "Loading…"
+  },
+  "language": {
+    "switchTo": "عربي",
+    "restarting": "Restarting for Arabic layout…",
+    "toggleHint": "Switches the app language and layout direction"
+  },
+  "type": {
+    "title": "Type a message",
+    "placeholder": "Type here…",
+    "clear": "Clear",
+    "speakWhatITyped": "Speak what I typed",
+    "suggestions": "Suggestions"
+  },
+  "myPhrases": {
+    "title": "My phrases",
+    "recentlyUsed": "Recently used",
+    "favorites": "Favorites",
+    "empty": "Phrases you use or mark as favorites will appear here for one-tap access.",
+    "favorite": "Add to favorites",
+    "unfavorite": "Remove from favorites"
+  },
+  "pin": {
+    "title": "Caregiver access",
+    "enter": "Enter the 4-digit caregiver PIN",
+    "create": "Create a 4-digit caregiver PIN",
+    "confirm": "Enter the same PIN again to confirm",
+    "wrong": "Wrong PIN. Try again.",
+    "mismatch": "PINs did not match. Start again.",
+    "deleteDigit": "Delete last digit"
+  },
+  "settings": {
+    "title": "Caregiver settings",
+    "phrases": "Custom phrases",
+    "addPhrase": "Add a phrase",
+    "editPhrase": "Edit phrase",
+    "display": "Display",
+    "textSize": "Text size",
+    "highContrast": "High contrast",
+    "on": "On",
+    "off": "Off",
+    "speech": "Speech",
+    "voiceEn": "English voice",
+    "voiceAr": "Arabic voice",
+    "systemDefault": "System default",
+    "speechRate": "Speaking speed",
+    "testVoice": "Test voice",
+    "testSentence": "Hello, I am your voice.",
+    "language": "Language",
+    "english": "English",
+    "arabic": "Arabic",
+    "danger": "Danger zone",
+    "resetApp": "Reset app",
+    "resetTitle": "Reset everything?",
+    "resetBody": "This deletes all custom phrases, favorites, and settings. This cannot be undone.",
+    "resetConfirm": "Yes, reset everything",
+    "changePin": "Change PIN"
+  },
+  "editPhrase": {
+    "titleNew": "New phrase",
+    "titleEdit": "Edit phrase",
+    "textEn": "Phrase in English",
+    "textAr": "Phrase in Arabic",
+    "photo": "Photo (optional)",
+    "addPhoto": "Choose a photo",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove photo",
+    "deletePhrase": "Delete this phrase",
+    "deleteConfirmTitle": "Delete this phrase?",
+    "deleteConfirmBody": "The phrase will be removed from My words.",
+    "required": "Both languages are required so the phrase works after switching language."
+  },
+  "a11y": {
+    "speaks": "Speaks: {{text}}",
+    "emergencyButton": "Call the nurse. Emergency button. Speaks immediately.",
+    "openCategory": "Open category {{name}}",
+    "openSettings": "Open caregiver settings",
+    "languageToggle": "Switch language to Arabic",
+    "textInput": "Message to speak",
+    "photoOfPhrase": "Photo for this phrase"
+  }
+}

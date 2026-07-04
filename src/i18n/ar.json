@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "تكلم عني"
+  },
+  "home": {
+    "callNurse": "نادِ الممرضة",
+    "typeMessage": "اكتب رسالة",
+    "myPhrases": "عباراتي"
+  },
+  "common": {
+    "back": "رجوع",
+    "close": "إغلاق",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "speak": "انطق",
+    "loading": "جارٍ التحميل…"
+  },
+  "language": {
+    "switchTo": "English",
+    "restarting": "جارٍ إعادة التشغيل للتخطيط الإنجليزي…",
+    "toggleHint": "يغيّر لغة التطبيق واتجاه التخطيط"
+  },
+  "type": {
+    "title": "اكتب رسالة",
+    "placeholder": "اكتب هنا…",
+    "clear": "مسح",
+    "speakWhatITyped": "انطق ما كتبته",
+    "suggestions": "اقتراحات"
+  },
+  "myPhrases": {
+    "title": "عباراتي",
+    "recentlyUsed": "المستخدمة مؤخراً",
+    "favorites": "المفضلة",
+    "empty": "العبارات التي تستخدمها أو تضيفها إلى المفضلة ستظهر هنا للوصول إليها بلمسة واحدة.",
+    "favorite": "أضف إلى المفضلة",
+    "unfavorite": "أزل من المفضلة"
+  },
+  "pin": {
+    "title": "دخول مقدم الرعاية",
+    "enter": "أدخل رمز PIN المكوّن من 4 أرقام",
+    "create": "أنشئ رمز PIN من 4 أرقام لمقدم الرعاية",
+    "confirm": "أدخل الرمز نفسه مرة أخرى للتأكيد",
+    "wrong": "رمز خاطئ. حاول مرة أخرى.",
+    "mismatch": "الرمزان غير متطابقين. ابدأ من جديد.",
+    "deleteDigit": "احذف آخر رقم"
+  },
+  "settings": {
+    "title": "إعدادات مقدم الرعاية",
+    "phrases": "عبارات مخصصة",
+    "addPhrase": "أضف عبارة",
+    "editPhrase": "تعديل العبارة",
+    "display": "العرض",
+    "textSize": "حجم النص",
+    "highContrast": "تباين عالٍ",
+    "on": "مفعّل",
+    "off": "متوقف",
+    "speech": "النطق",
+    "voiceEn": "الصوت الإنجليزي",
+    "voiceAr": "الصوت العربي",
+    "systemDefault": "الافتراضي للنظام",
+    "speechRate": "سرعة النطق",
+    "testVoice": "جرّب الصوت",
+    "testSentence": "مرحباً، أنا صوتك.",
+    "language": "اللغة",
+    "english": "English",
+    "arabic": "العربية",
+    "danger": "منطقة الخطر",
+    "resetApp": "إعادة ضبط التطبيق",
+    "resetTitle": "إعادة ضبط كل شيء؟",
+    "resetBody": "سيحذف هذا كل العبارات المخصصة والمفضلة والإعدادات. لا يمكن التراجع عن هذا.",
+    "resetConfirm": "نعم، أعد ضبط كل شيء",
+    "changePin": "تغيير رمز PIN"
+  },
+  "editPhrase": {
+    "titleNew": "عبارة جديدة",
+    "titleEdit": "تعديل العبارة",
+    "textEn": "العبارة بالإنجليزية",
+    "textAr": "العبارة بالعربية",
+    "photo": "صورة (اختياري)",
+    "addPhoto": "اختر صورة",
+    "changePhoto": "غيّر الصورة",
+    "removePhoto": "أزل الصورة",
+    "deletePhrase": "احذف هذه العبارة",
+    "deleteConfirmTitle": "حذف هذه العبارة؟",
+    "deleteConfirmBody": "ستُزال العبارة من كلماتي.",
+    "required": "اللغتان مطلوبتان حتى تعمل العبارة بعد تغيير اللغة."
+  },
+  "a11y": {
+    "speaks": "ينطق: {{text}}",
+    "emergencyButton": "نادِ الممرضة. زر الطوارئ. ينطق فوراً.",
+    "openCategory": "افتح فئة {{name}}",
+    "openSettings": "افتح إعدادات مقدم الرعاية",
+    "languageToggle": "غيّر اللغة إلى الإنجليزية",
+    "textInput": "الرسالة المراد نطقها",
+    "photoOfPhrase": "صورة لهذه العبارة"
+  }
+}

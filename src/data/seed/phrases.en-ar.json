@@ -1,0 +1,30 @@
+{
+  "categories": [
+    { "id": "emergency", "en": "Emergency", "ar": "طوارئ", "iconName": "bell-alert", "sortOrder": 0, "isEmergency": true },
+    { "id": "basic-needs", "en": "Basic needs", "ar": "احتياجات أساسية", "iconName": "hand-heart", "sortOrder": 1 },
+    { "id": "pain-body", "en": "Pain & body", "ar": "الألم والجسم", "iconName": "human", "sortOrder": 2 },
+    { "id": "emotions", "en": "Emotions", "ar": "مشاعر", "iconName": "emoticon-happy-outline", "sortOrder": 3 },
+    { "id": "questions", "en": "Questions", "ar": "أسئلة", "iconName": "help-circle-outline", "sortOrder": 4 },
+    { "id": "my-words", "en": "My words", "ar": "كلماتي", "iconName": "star-outline", "sortOrder": 5 }
+  ],
+  "phrases": [
+    { "en": "Call the nurse", "ar": "نادِ الممرضة", "category": "emergency", "iconName": "bell-alert" },
+    { "en": "I can't breathe well", "ar": "لا أستطيع التنفس جيداً", "category": "emergency", "iconName": "lungs" },
+    { "en": "I need water", "ar": "أحتاج ماء", "category": "basic-needs", "iconName": "cup-water" },
+    { "en": "I need the bathroom", "ar": "أحتاج الحمام", "category": "basic-needs", "iconName": "toilet" },
+    { "en": "I'm tired", "ar": "أنا متعب", "category": "basic-needs", "iconName": "bed" },
+    { "en": "Please turn me / change my position", "ar": "غيّر وضعيتي من فضلك", "category": "basic-needs", "iconName": "rotate-right" },
+    { "en": "I want to sleep", "ar": "أريد أن أنام", "category": "basic-needs", "iconName": "sleep" },
+    { "en": "I'm in pain", "ar": "أشعر بألم", "category": "pain-body", "iconName": "lightning-bolt" },
+    { "en": "I'm cold", "ar": "أشعر بالبرد", "category": "pain-body", "iconName": "snowflake" },
+    { "en": "I'm hot", "ar": "أشعر بالحر", "category": "pain-body", "iconName": "weather-sunny" },
+    { "en": "I want to see my family", "ar": "أريد رؤية عائلتي", "category": "emotions", "iconName": "account-group" },
+    { "en": "I'm scared", "ar": "أشعر بالخوف", "category": "emotions", "iconName": "emoticon-cry-outline" },
+    { "en": "I'm anxious", "ar": "أشعر بالقلق", "category": "emotions", "iconName": "emoticon-confused-outline" },
+    { "en": "Thank you", "ar": "شكراً", "category": "emotions", "iconName": "hand-heart" },
+    { "en": "Where am I?", "ar": "أين أنا؟", "category": "questions", "iconName": "map-marker-question" },
+    { "en": "What day is it?", "ar": "ما هو اليوم؟", "category": "questions", "iconName": "calendar-question" },
+    { "en": "Yes", "ar": "نعم", "category": "questions", "iconName": "check-bold" },
+    { "en": "No", "ar": "لا", "category": "questions", "iconName": "close-thick" }
+  ]
+}

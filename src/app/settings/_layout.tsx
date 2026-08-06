@@ -10,7 +10,6 @@ import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useSettings } from '@/hooks/useSettings';
 import { useSettingsStore } from '@/store/settingsStore';
-import { spacing } from '@/theme/tokens';
 
 export async function hashPin(pin: string): Promise<string> {
   return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, `speak-for-me:${pin}`);
@@ -72,7 +71,7 @@ export default function SettingsLayout() {
     return (
       <Screen>
         <ScreenHeader title={t('pin.title')} />
-        <View style={{ flex: 1, justifyContent: 'center', padding: spacing.lg }}>
+        <View className="flex-1 justify-center p-4">
           <PinPad prompt={prompt} error={error} onComplete={handleComplete} />
         </View>
       </Screen>

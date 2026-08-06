@@ -12,8 +12,7 @@ import { phraseIcon } from '@/components/PhraseTile';
 import { useLanguageSwitch, useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
 import { usePhraseStore } from '@/store/phraseStore';
-import { spacing } from '@/theme/tokens';
-import { useTheme } from '@/theme/useTheme';
+import { useAppColors } from '@/theme/useAppColors';
 
 const EMERGENCY_CATEGORY_ID = 'emergency';
 
@@ -28,7 +27,7 @@ interface HomeTile {
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors } = useTheme();
+  const colors = useAppColors();
   const { language } = useSettings();
   const { restarting, switchLanguage } = useLanguageSwitch();
   const { speakPhrase, speakText } = useSpeech();
@@ -76,16 +75,8 @@ export default function HomeScreen() {
 
   return (
     <Screen>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: spacing.md,
-          paddingHorizontal: spacing.lg,
-          paddingVertical: spacing.sm,
-        }}
-      >
-        <AppText size="lg" weight="bold" style={{ flex: 1 }} accessibilityRole="header">
+      <View className="flex-row items-center gap-3 px-4 py-2">
+        <AppText size="lg" weight="bold" className="flex-1" accessibilityRole="header">
           {t('app.name')}
         </AppText>
 
@@ -94,9 +85,9 @@ export default function HomeScreen() {
           accessibilityLabel={t('a11y.languageToggle')}
           accessibilityHint={t('language.toggleHint')}
           minSize={64}
-          style={{ paddingHorizontal: spacing.lg }}
+          className="px-4"
         >
-          <AppText weight="bold" color={colors.primary}>
+          <AppText weight="bold" tone="primary">
             {t('language.switchTo')}
           </AppText>
         </BigButton>
@@ -106,22 +97,20 @@ export default function HomeScreen() {
           accessibilityLabel={t('a11y.openSettings')}
           minSize={64}
         >
-          <MaterialCommunityIcons name="cog" size={30} color={colors.textMuted} />
+          <MaterialCommunityIcons name="cog" size={30} color={colors.muted} />
         </BigButton>
       </View>
 
       {/* Emergency: one tap, always visible, never behind a scroll. */}
-      <View style={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.md }}>
+      <View className="px-4 pb-3">
         <BigButton
           onPress={speakCallNurse}
           accessibilityLabel={t('a11y.emergencyButton')}
-          color={colors.danger}
-          pressedColor={colors.dangerPressed}
-          borderColor={colors.danger}
-          style={{ flexDirection: 'row', gap: spacing.md, paddingVertical: spacing.lg }}
+          tone="danger"
+          className="flex-row gap-3 py-4"
         >
           <MaterialCommunityIcons name="bell-alert" size={40} color={colors.onDanger} />
-          <AppText size="xl" weight="bold" color={colors.onDanger}>
+          <AppText size="xl" weight="bold" tone="onDanger">
             {t('home.callNurse')}
           </AppText>
         </BigButton>
@@ -131,20 +120,16 @@ export default function HomeScreen() {
         data={tiles}
         keyExtractor={(tile) => tile.key}
         numColumns={2}
-        columnWrapperStyle={{ gap: spacing.md }}
-        contentContainerStyle={{
-          paddingHorizontal: spacing.lg,
-          paddingBottom: spacing.xl,
-          gap: spacing.md,
-        }}
+        columnWrapperClassName="gap-3"
+        contentContainerClassName="gap-3 px-4 pb-8"
         renderItem={({ item }) => (
           <BigButton
             onPress={item.onPress}
             accessibilityLabel={item.a11yLabel}
-            style={{ flex: 1, minHeight: 130, padding: spacing.md }}
+            className="min-h-36 flex-1 border-accent/30 p-3"
           >
             <MaterialCommunityIcons name={phraseIcon(item.iconName)} size={44} color={colors.accent} />
-            <AppText size="md" weight="medium" style={{ textAlign: 'center', marginTop: spacing.sm }}>
+            <AppText size="md" weight="medium" className="mt-2 text-center">
               {item.label}
             </AppText>
           </BigButton>

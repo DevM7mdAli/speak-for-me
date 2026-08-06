@@ -14,13 +14,14 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import type { AppLanguage } from '@/i18n';
 import { useLanguageSwitch, useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
+import type { Phrase } from '@/data/models';
 import { usePhraseStore } from '@/store/phraseStore';
 import { useSettingsStore } from '@/store/settingsStore';
-import { spacing } from '@/theme/tokens';
-import { useTheme } from '@/theme/useTheme';
+import { useAppColors } from '@/theme/useAppColors';
 import { useSettingsGate } from './_layout';
 
 const MY_WORDS_CATEGORY_ID = 'my-words';
+const EMPTY_PHRASES: Phrase[] = [];
 const TEXT_SCALE_MIN = 1.0;
 const TEXT_SCALE_MAX = 1.6;
 const TEXT_SCALE_STEP = 0.2;
@@ -32,7 +33,7 @@ const SPEECH_RATES: { key: string; value: number }[] = [
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View style={{ gap: spacing.md }}>
+    <View className="gap-3">
       <AppText size="md" weight="bold" muted accessibilityRole="header">
         {title}
       </AppText>
@@ -51,18 +52,16 @@ function OptionButton({
   selected: boolean;
   onPress: () => void;
 }) {
-  const { colors } = useTheme();
   return (
     <BigButton
       onPress={onPress}
       accessibilityLabel={label}
       accessibilityState={{ selected }}
       minSize={64}
-      color={selected ? colors.primary : undefined}
-      pressedColor={selected ? colors.primaryPressed : undefined}
-      style={{ flex: 1, paddingHorizontal: spacing.md }}
+      tone={selected ? 'primary' : 'default'}
+      className="flex-1 px-3"
     >
-      <AppText weight="medium" color={selected ? colors.onPrimary : undefined} numberOfLines={1}>
+      <AppText weight="medium" tone={selected ? 'onPrimary' : 'default'} numberOfLines={1}>
         {label}
       </AppText>
     </BigButton>
@@ -75,7 +74,7 @@ function VoicePicker({ language }: { language: AppLanguage }) {
   const update = useSettingsStore((s) => s.update);
   const [voices, setVoices] = useState<Speech.Voice[]>([]);
   const [expanded, setExpanded] = useState(false);
-  const { colors } = useTheme();
+  const colors = useAppColors();
 
   useEffect(() => {
     Speech.getAvailableVoicesAsync().then((all) =>
@@ -93,29 +92,29 @@ function VoicePicker({ language }: { language: AppLanguage }) {
   };
 
   return (
-    <View style={{ gap: spacing.md }}>
+    <View className="gap-3">
       <BigButton
         onPress={() => setExpanded((e) => !e)}
         accessibilityLabel={`${label}: ${selectedName}`}
         accessibilityState={{ expanded }}
         minSize={64}
-        style={{ flexDirection: 'row', paddingHorizontal: spacing.lg, gap: spacing.md }}
+        className="flex-row gap-3 px-4"
       >
-        <AppText weight="medium" style={{ flex: 1 }}>
+        <AppText weight="medium" className="flex-1">
           {label}
         </AppText>
-        <AppText muted numberOfLines={1} style={{ maxWidth: 140 }}>
+        <AppText muted numberOfLines={1} className="max-w-36">
           {selectedName}
         </AppText>
         <MaterialCommunityIcons
           name={expanded ? 'chevron-up' : 'chevron-down'}
           size={28}
-          color={colors.textMuted}
+          color={colors.muted}
         />
       </BigButton>
 
       {expanded && (
-        <View style={{ gap: spacing.md, paddingStart: spacing.lg }}>
+        <View className="gap-3 ps-4">
           <OptionButton
             label={t('settings.systemDefault')}
             selected={!selectedId}
@@ -138,7 +137,7 @@ function VoicePicker({ language }: { language: AppLanguage }) {
 export default function SettingsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors } = useTheme();
+  const colors = useAppColors();
   const settings = useSettings();
   const update = useSettingsStore((s) => s.update);
   const resetSettings = useSettingsStore((s) => s.reset);
@@ -146,7 +145,9 @@ export default function SettingsScreen() {
   const { speakText } = useSpeech();
   const { restartPinSetup } = useSettingsGate();
 
-  const customPhrases = usePhraseStore((s) => s.phrasesByCategory[MY_WORDS_CATEGORY_ID] ?? []);
+  const customPhrases = usePhraseStore(
+    (s) => s.phrasesByCategory[MY_WORDS_CATEGORY_ID] ?? EMPTY_PHRASES,
+  );
   const loadCategory = usePhraseStore((s) => s.loadCategory);
   const resetToSeed = usePhraseStore((s) => s.resetToSeed);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -176,9 +177,9 @@ export default function SettingsScreen() {
   return (
     <Screen>
       <ScreenHeader title={t('settings.title')} />
-      <ScrollView contentContainerStyle={{ padding: spacing.lg, gap: spacing.xl }}>
+      <ScrollView contentContainerClassName="gap-6 p-4">
         <Section title={t('settings.language')}>
-          <View style={{ flexDirection: 'row', gap: spacing.md }}>
+          <View className="flex-row gap-3">
             <OptionButton
               label={t('settings.english')}
               selected={settings.language === 'en'}
@@ -193,7 +194,7 @@ export default function SettingsScreen() {
         </Section>
 
         <Section title={t('settings.display')}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+          <View className="flex-row items-center gap-3">
             <BigButton
               onPress={() => setTextScale(-TEXT_SCALE_STEP)}
               accessibilityLabel={`${t('settings.textSize')} −`}
@@ -203,7 +204,7 @@ export default function SettingsScreen() {
                 A−
               </AppText>
             </BigButton>
-            <AppText size="md" weight="medium" style={{ flex: 1, textAlign: 'center' }}>
+            <AppText size="md" weight="medium" className="flex-1 text-center">
               {Math.round(settings.textScale * 100)}%
             </AppText>
             <BigButton
@@ -223,19 +224,19 @@ export default function SettingsScreen() {
             accessibilityRole="switch"
             accessibilityState={{ checked: settings.highContrast }}
             minSize={64}
-            style={{ flexDirection: 'row', paddingHorizontal: spacing.lg, gap: spacing.md }}
+            className="flex-row gap-3 px-4"
           >
-            <AppText weight="medium" style={{ flex: 1 }}>
+            <AppText weight="medium" className="flex-1">
               {t('settings.highContrast')}
             </AppText>
-            <AppText weight="bold" color={settings.highContrast ? colors.success : colors.textMuted}>
+            <AppText weight="bold" tone={settings.highContrast ? 'success' : 'muted'}>
               {settings.highContrast ? t('settings.on') : t('settings.off')}
             </AppText>
           </BigButton>
         </Section>
 
         <Section title={t('settings.speech')}>
-          <View style={{ flexDirection: 'row', gap: spacing.md }}>
+          <View className="flex-row gap-3">
             {SPEECH_RATES.map((rate) => (
               <OptionButton
                 key={rate.key}
@@ -251,7 +252,7 @@ export default function SettingsScreen() {
             onPress={() => speakText(t('settings.testSentence'))}
             accessibilityLabel={t('settings.testVoice')}
             minSize={64}
-            style={{ flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.lg }}
+            className="flex-row gap-3 px-4"
           >
             <MaterialCommunityIcons name="volume-high" size={28} color={colors.primary} />
             <AppText weight="medium">{t('settings.testVoice')}</AppText>
@@ -262,13 +263,12 @@ export default function SettingsScreen() {
           <BigButton
             onPress={() => router.push('/settings/edit-phrase')}
             accessibilityLabel={t('settings.addPhrase')}
-            color={colors.primary}
-            pressedColor={colors.primaryPressed}
+            tone="primary"
             minSize={64}
-            style={{ flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.lg }}
+            className="flex-row gap-3 px-4"
           >
             <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
-            <AppText weight="bold" color={colors.onPrimary}>
+            <AppText weight="bold" tone="onPrimary">
               {t('settings.addPhrase')}
             </AppText>
           </BigButton>
@@ -281,12 +281,12 @@ export default function SettingsScreen() {
               }
               accessibilityLabel={`${t('settings.editPhrase')}: ${phrase.text[settings.language]}`}
               minSize={64}
-              style={{ flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.lg }}
+              className="flex-row gap-3 px-4"
             >
-              <AppText weight="medium" style={{ flex: 1 }} numberOfLines={1}>
+              <AppText weight="medium" className="flex-1" numberOfLines={1}>
                 {phrase.text[settings.language]}
               </AppText>
-              <MaterialCommunityIcons name="pencil" size={26} color={colors.textMuted} />
+              <MaterialCommunityIcons name="pencil" size={26} color={colors.muted} />
             </BigButton>
           ))}
         </Section>
@@ -296,7 +296,7 @@ export default function SettingsScreen() {
             onPress={restartPinSetup}
             accessibilityLabel={t('settings.changePin')}
             minSize={64}
-            style={{ paddingHorizontal: spacing.lg }}
+            className="px-4"
           >
             <AppText weight="medium">{t('settings.changePin')}</AppText>
           </BigButton>
@@ -304,11 +304,11 @@ export default function SettingsScreen() {
           <BigButton
             onPress={() => setConfirmReset(true)}
             accessibilityLabel={t('settings.resetApp')}
-            borderColor={colors.danger}
+            tone="dangerOutline"
             minSize={64}
-            style={{ paddingHorizontal: spacing.lg }}
+            className="px-4"
           >
-            <AppText weight="bold" color={colors.danger}>
+            <AppText weight="bold" tone="danger">
               {t('settings.resetApp')}
             </AppText>
           </BigButton>

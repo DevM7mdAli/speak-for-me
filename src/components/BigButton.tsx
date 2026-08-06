@@ -3,13 +3,18 @@ import {
   Pressable,
   type AccessibilityRole,
   type AccessibilityState,
-  type StyleProp,
-  type ViewStyle,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
-import { MIN_TAP_TARGET, radius } from '@/theme/tokens';
-import { useTheme } from '@/theme/useTheme';
+const MIN_TAP_TARGET = 88;
+type ButtonTone = 'default' | 'primary' | 'danger' | 'dangerOutline';
+
+const tones: Record<ButtonTone, string> = {
+  default: 'border-border bg-surface active:bg-surface-pressed',
+  primary: 'border-primary bg-primary active:bg-primary-pressed',
+  danger: 'border-danger bg-danger active:bg-danger-pressed',
+  dangerOutline: 'border-danger bg-surface active:bg-surface-pressed',
+};
 
 interface BigButtonProps {
   onPress: () => void;
@@ -18,10 +23,7 @@ interface BigButtonProps {
   accessibilityRole?: AccessibilityRole;
   accessibilityState?: AccessibilityState;
   children: ReactNode;
-  /** Background / pressed-background; defaults to surface colors. */
-  color?: string;
-  pressedColor?: string;
-  borderColor?: string;
+  tone?: ButtonTone;
   /**
    * Primary targets keep the 88dp minimum. Secondary controls
    * (favorite star, keypad delete) may opt down to 56dp.
@@ -29,7 +31,7 @@ interface BigButtonProps {
   minSize?: number;
   haptic?: boolean;
   disabled?: boolean;
-  style?: StyleProp<ViewStyle>;
+  className?: string;
 }
 
 /**
@@ -44,16 +46,12 @@ export function BigButton({
   accessibilityRole = 'button',
   accessibilityState,
   children,
-  color,
-  pressedColor,
-  borderColor,
+  tone = 'default',
   minSize = MIN_TAP_TARGET,
   haptic = true,
   disabled = false,
-  style,
+  className,
 }: BigButtonProps) {
-  const { colors, bw } = useTheme();
-
   const handlePress = () => {
     if (haptic) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -69,23 +67,7 @@ export function BigButton({
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled, ...accessibilityState }}
-      style={({ pressed }) => [
-        {
-          minWidth: minSize,
-          minHeight: minSize,
-          borderRadius: radius.md,
-          borderWidth: bw,
-          borderColor: borderColor ?? colors.border,
-          backgroundColor: pressed
-            ? (pressedColor ?? colors.surfacePressed)
-            : (color ?? colors.surface),
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: disabled ? 0.4 : 1,
-          transform: [{ scale: pressed ? 0.97 : 1 }],
-        },
-        style,
-      ]}
+      className={`${minSize >= MIN_TAP_TARGET ? 'min-h-[88px] min-w-[88px]' : 'min-h-16 min-w-16'} items-center justify-center rounded-control border-2 high-contrast:border-[3px] active:scale-[0.98] disabled:opacity-40 ${tones[tone]} ${className ?? ''}`}
     >
       {children}
     </Pressable>

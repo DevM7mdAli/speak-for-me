@@ -1,13 +1,11 @@
-import { View, Pressable } from 'react-native';
-import { Image } from 'expo-image';
+import { Image, Pressable, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import type { Phrase } from '@/data/models';
 import { useSettings } from '@/hooks/useSettings';
-import { spacing, radius } from '@/theme/tokens';
-import { useTheme } from '@/theme/useTheme';
+import { useAppColors } from '@/theme/useAppColors';
 import { AppText } from './AppText';
 import { BigButton } from './BigButton';
 
@@ -31,29 +29,29 @@ interface PhraseTileProps {
  * favorite star is a separate, single-tap secondary control.
  */
 export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProps) {
-  const { colors, bw } = useTheme();
+  const colors = useAppColors();
   const { language } = useSettings();
   const { t } = useTranslation();
   const text = phrase.text[language];
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       <BigButton
         onPress={() => onSpeak(phrase)}
         accessibilityLabel={t('a11y.speaks', { text })}
-        style={{ padding: spacing.md, minHeight: 120 }}
+        className="min-h-[132px] border-accent/35 p-3"
       >
         {phrase.photoUri ? (
           <Image
             source={{ uri: phrase.photoUri }}
-            style={{ width: 56, height: 56, borderRadius: radius.sm }}
-            contentFit="cover"
+            className="h-14 w-14 rounded-[10px]"
+            resizeMode="cover"
             accessibilityLabel={t('a11y.photoOfPhrase')}
           />
         ) : (
           <MaterialCommunityIcons name={phraseIcon(phrase.iconName)} size={40} color={colors.accent} />
         )}
-        <AppText size="md" weight="medium" style={{ textAlign: 'center', marginTop: spacing.sm }}>
+        <AppText size="md" weight="medium" className="mt-2 text-center">
           {text}
         </AppText>
       </BigButton>
@@ -68,24 +66,12 @@ export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProp
           accessibilityLabel={phrase.isFavorite ? t('myPhrases.unfavorite') : t('myPhrases.favorite')}
           accessibilityState={{ selected: phrase.isFavorite }}
           hitSlop={8}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            top: spacing.xs,
-            end: spacing.xs,
-            width: 48,
-            height: 48,
-            borderRadius: radius.sm,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.surfacePressed : 'transparent',
-            borderWidth: pressed ? bw : 0,
-            borderColor: colors.border,
-          })}
+          className="absolute top-1 end-1 h-12 w-12 items-center justify-center rounded-[10px] active:border-2 active:border-border active:bg-surface-pressed"
         >
           <MaterialCommunityIcons
             name={phrase.isFavorite ? 'star' : 'star-outline'}
             size={28}
-            color={phrase.isFavorite ? colors.accent : colors.textMuted}
+            color={phrase.isFavorite ? colors.accent : colors.muted}
           />
         </Pressable>
       )}

@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+@theme {
+  --font-tajawal: 'Tajawal_400Regular';
+  --font-tajawal-medium: 'Tajawal_500Medium';
+  --font-tajawal-bold: 'Tajawal_700Bold';
+  --radius-control: 16px;
+  --radius-dialog: 24px;
+}
+
+@layer theme {
+  :root {
+    @variant light {
+      --color-background: #f2f6f5;
+      --color-surface: #ffffff;
+      --color-surface-pressed: #dbe8e5;
+      --color-border: #afc6c0;
+      --color-foreground: #102a27;
+      --color-muted: #4b6560;
+      --color-primary: #006c67;
+      --color-on-primary: #ffffff;
+      --color-primary-pressed: #00524e;
+      --color-danger: #c83331;
+      --color-on-danger: #ffffff;
+      --color-danger-pressed: #a32624;
+      --color-success: #087443;
+      --color-accent: #007e79;
+    }
+
+    @variant dark {
+      --color-background: #102421;
+      --color-surface: #17312e;
+      --color-surface-pressed: #26433e;
+      --color-border: #7faaa0;
+      --color-foreground: #f2fbf8;
+      --color-muted: #c2d7d1;
+      --color-primary: #62d1c6;
+      --color-on-primary: #062725;
+      --color-primary-pressed: #42b8ad;
+      --color-danger: #ff8580;
+      --color-on-danger: #32110f;
+      --color-danger-pressed: #eb625d;
+      --color-success: #76e0a8;
+      --color-accent: #62d1c6;
+    }
+
+    @variant high-contrast {
+      --color-background: #000000;
+      --color-surface: #0d0d0d;
+      --color-surface-pressed: #353535;
+      --color-border: #ffffff;
+      --color-foreground: #ffffff;
+      --color-muted: #f0f0f0;
+      --color-primary: #ffd60a;
+      --color-on-primary: #000000;
+      --color-primary-pressed: #c7a600;
+      --color-danger: #ff6961;
+      --color-on-danger: #000000;
+      --color-danger-pressed: #d84b44;
+      --color-success: #70e69a;
+      --color-accent: #ffd60a;
+    }
+  }
+}

@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react';
-import { I18nManager, ScrollView, TextInput, View } from 'react-native';
+import { Image, ScrollView, TextInput, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { File, Paths } from 'expo-file-system';
 import { randomUUID } from 'expo-crypto';
-import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { LayoutDirection } from 'uniwind';
 
-import { AppText } from '@/components/AppText';
+import { AppText, textSizeClass } from '@/components/AppText';
 import { BigButton } from '@/components/BigButton';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { Phrase } from '@/data/models';
 import { phraseRepository } from '@/data/repositories';
+import { useSettings } from '@/hooks/useSettings';
 import { usePhraseStore } from '@/store/phraseStore';
-import { fontFamily, radius, spacing } from '@/theme/tokens';
-import { useTheme } from '@/theme/useTheme';
+import { useAppColors } from '@/theme/useAppColors';
 
 const MY_WORDS_CATEGORY_ID = 'my-words';
 
@@ -41,7 +41,8 @@ export default function EditPhraseScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors, bw, fs } = useTheme();
+  const colors = useAppColors();
+  const { textScale } = useSettings();
 
   const createPhrase = usePhraseStore((s) => s.createPhrase);
   const updatePhrase = usePhraseStore((s) => s.updatePhrase);
@@ -112,40 +113,34 @@ export default function EditPhraseScreen() {
     router.back();
   };
 
-  const inputStyle = {
-    minHeight: 64,
-    borderWidth: bw,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    color: colors.text,
-    fontFamily: fontFamily.regular,
-    fontSize: fs('md'),
-    padding: spacing.lg,
-  } as const;
+  const inputClassName = `min-h-16 rounded-control border-2 border-border bg-surface p-4 font-tajawal ${textSizeClass('md', textScale)} text-foreground high-contrast:border-[3px]`;
 
   return (
     <Screen>
       <ScreenHeader title={id ? t('editPhrase.titleEdit') : t('editPhrase.titleNew')} />
       <ScrollView
-        contentContainerStyle={{ padding: spacing.lg, gap: spacing.lg }}
+        contentContainerClassName="gap-4 p-4"
         keyboardShouldPersistTaps="handled"
       >
         <AppText weight="medium">{t('editPhrase.textEn')}</AppText>
-        <TextInput
-          value={textEn}
-          onChangeText={setTextEn}
-          accessibilityLabel={t('editPhrase.textEn')}
-          style={[inputStyle, { textAlign: I18nManager.isRTL ? 'right' : 'left' }]}
-        />
+        <LayoutDirection rtl={false}>
+          <TextInput
+            value={textEn}
+            onChangeText={setTextEn}
+            accessibilityLabel={t('editPhrase.textEn')}
+            className={`${inputClassName} text-left`}
+          />
+        </LayoutDirection>
 
         <AppText weight="medium">{t('editPhrase.textAr')}</AppText>
-        <TextInput
-          value={textAr}
-          onChangeText={setTextAr}
-          accessibilityLabel={t('editPhrase.textAr')}
-          style={[inputStyle, { textAlign: 'right', writingDirection: 'rtl' }]}
-        />
+        <LayoutDirection rtl>
+          <TextInput
+            value={textAr}
+            onChangeText={setTextAr}
+            accessibilityLabel={t('editPhrase.textAr')}
+            className={`${inputClassName} text-right`}
+          />
+        </LayoutDirection>
 
         <AppText size="sm" muted>
           {t('editPhrase.required')}
@@ -155,17 +150,17 @@ export default function EditPhraseScreen() {
         {photoUri && (
           <Image
             source={{ uri: photoUri }}
-            style={{ width: 120, height: 120, borderRadius: radius.md, alignSelf: 'flex-start' }}
-            contentFit="cover"
+            className="h-30 w-30 self-start rounded-control"
+            resizeMode="cover"
             accessibilityLabel={t('a11y.photoOfPhrase')}
           />
         )}
-        <View style={{ flexDirection: 'row', gap: spacing.md }}>
+        <View className="flex-row gap-3">
           <BigButton
             onPress={pickPhoto}
             accessibilityLabel={photoUri ? t('editPhrase.changePhoto') : t('editPhrase.addPhoto')}
             minSize={64}
-            style={{ flex: 1, flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md }}
+            className="flex-1 flex-row gap-2 px-3"
           >
             <MaterialCommunityIcons name="image-plus" size={26} color={colors.primary} />
             <AppText weight="medium">
@@ -177,9 +172,9 @@ export default function EditPhraseScreen() {
               onPress={() => setPhotoUri(undefined)}
               accessibilityLabel={t('editPhrase.removePhoto')}
               minSize={64}
-              style={{ paddingHorizontal: spacing.md }}
+              className="px-3"
             >
-              <AppText weight="medium" color={colors.danger}>
+              <AppText weight="medium" tone="danger">
                 {t('editPhrase.removePhoto')}
               </AppText>
             </BigButton>
@@ -190,11 +185,10 @@ export default function EditPhraseScreen() {
           onPress={handleSave}
           accessibilityLabel={t('common.save')}
           disabled={!canSave}
-          color={colors.primary}
-          pressedColor={colors.primaryPressed}
-          style={{ padding: spacing.md }}
+          tone="primary"
+          className="p-3"
         >
-          <AppText size="lg" weight="bold" color={colors.onPrimary}>
+          <AppText size="lg" weight="bold" tone="onPrimary">
             {t('common.save')}
           </AppText>
         </BigButton>
@@ -203,11 +197,11 @@ export default function EditPhraseScreen() {
           <BigButton
             onPress={() => setConfirmDelete(true)}
             accessibilityLabel={t('editPhrase.deletePhrase')}
-            borderColor={colors.danger}
+            tone="dangerOutline"
             minSize={64}
-            style={{ paddingHorizontal: spacing.lg }}
+            className="px-4"
           >
-            <AppText weight="bold" color={colors.danger}>
+            <AppText weight="bold" tone="danger">
               {t('editPhrase.deletePhrase')}
             </AppText>
           </BigButton>

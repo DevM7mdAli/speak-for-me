@@ -1,4 +1,5 @@
 import '@/i18n';
+import '@/global.css';
 
 import { useEffect, useState } from 'react';
 import { I18nManager, Platform } from 'react-native';
@@ -12,10 +13,11 @@ import {
   Tajawal_700Bold,
   useFonts,
 } from '@expo-google-fonts/tajawal';
+import { SafeAreaListener } from 'react-native-safe-area-context';
+import { Uniwind } from 'uniwind';
 
 import { usePhraseStore } from '@/store/phraseStore';
 import { useSettingsStore } from '@/store/settingsStore';
-import { useTheme } from '@/theme/useTheme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,7 +33,7 @@ export default function RootLayout() {
     Tajawal_700Bold,
   });
   const [dataReady, setDataReady] = useState(false);
-  const { highContrast } = useTheme();
+  const highContrast = useSettingsStore((state) => state.settings.highContrast);
 
   useEffect(() => {
     async function boot() {
@@ -61,14 +63,18 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, dataReady]);
 
+  useEffect(() => {
+    Uniwind.setTheme(highContrast ? 'high-contrast' : 'light');
+  }, [highContrast]);
+
   if (!fontsLoaded || !dataReady) {
     return null;
   }
 
   return (
-    <>
+    <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
       <StatusBar style={highContrast ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false }} />
-    </>
+    </SafeAreaListener>
   );
 }

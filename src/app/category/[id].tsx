@@ -9,7 +9,6 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
 import { usePhraseStore } from '@/store/phraseStore';
-import { spacing } from '@/theme/tokens';
 
 export default function CategoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -35,12 +34,8 @@ export default function CategoryScreen() {
         data={phrases ?? []}
         keyExtractor={(phrase) => phrase.id}
         numColumns={2}
-        columnWrapperStyle={{ gap: spacing.md }}
-        contentContainerStyle={{
-          paddingHorizontal: spacing.lg,
-          paddingBottom: spacing.xl,
-          gap: spacing.md,
-        }}
+        columnWrapperClassName="gap-3"
+        contentContainerClassName="gap-3 px-4 pb-8"
         renderItem={({ item }) => (
           <PhraseTile phrase={item} onSpeak={speakPhrase} onToggleFavorite={toggleFavorite} />
         )}

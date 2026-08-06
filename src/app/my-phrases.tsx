@@ -10,7 +10,6 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import type { Phrase } from '@/data/models';
 import { useSpeech } from '@/hooks/useSpeech';
 import { usePhraseStore } from '@/store/phraseStore';
-import { spacing } from '@/theme/tokens';
 
 function TileGrid({ phrases }: { phrases: Phrase[] }) {
   const { speakPhrase } = useSpeech();
@@ -23,9 +22,9 @@ function TileGrid({ phrases }: { phrases: Phrase[] }) {
   }
 
   return (
-    <View style={{ gap: spacing.md }}>
+    <View className="gap-3">
       {rows.map((row) => (
-        <View key={row[0].id} style={{ flexDirection: 'row', gap: spacing.md }}>
+        <View key={row[0].id} className="flex-row gap-3">
           {row.map((phrase) => (
             <PhraseTile
               key={phrase.id}
@@ -34,7 +33,7 @@ function TileGrid({ phrases }: { phrases: Phrase[] }) {
               onToggleFavorite={toggleFavorite}
             />
           ))}
-          {row.length === 1 && <View style={{ flex: 1 }} />}
+          {row.length === 1 && <View className="flex-1" />}
         </View>
       ))}
     </View>
@@ -58,9 +57,9 @@ export default function MyPhrasesScreen() {
   return (
     <Screen>
       <ScreenHeader title={t('myPhrases.title')} />
-      <ScrollView contentContainerStyle={{ padding: spacing.lg, gap: spacing.lg }}>
+      <ScrollView contentContainerClassName="gap-4 p-4">
         {isEmpty && (
-          <AppText muted style={{ textAlign: 'center', marginTop: spacing.xxl }}>
+          <AppText muted className="mt-8 text-center">
             {t('myPhrases.empty')}
           </AppText>
         )}

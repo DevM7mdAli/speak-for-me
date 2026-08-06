@@ -1,8 +1,6 @@
 import { Modal, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { spacing, radius } from '@/theme/tokens';
-import { useTheme } from '@/theme/useTheme';
 import { AppText } from './AppText';
 import { BigButton } from './BigButton';
 
@@ -29,30 +27,12 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  const { colors, bw } = useTheme();
   const { t } = useTranslation();
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.6)',
-          justifyContent: 'center',
-          padding: spacing.xl,
-        }}
-      >
-        <View
-          accessibilityViewIsModal
-          style={{
-            backgroundColor: colors.background,
-            borderRadius: radius.lg,
-            borderWidth: bw,
-            borderColor: colors.border,
-            padding: spacing.xl,
-            gap: spacing.lg,
-          }}
-        >
+      <View className="flex-1 justify-center bg-black/60 p-6">
+        <View accessibilityViewIsModal className="gap-4 rounded-dialog border-2 border-border bg-background p-6 high-contrast:border-[3px]">
           <AppText size="lg" weight="bold" accessibilityRole="header">
             {title}
           </AppText>
@@ -61,16 +41,15 @@ export function ConfirmDialog({
           <BigButton
             onPress={onConfirm}
             accessibilityLabel={confirmLabel}
-            color={destructive ? colors.danger : colors.primary}
-            pressedColor={destructive ? colors.dangerPressed : colors.primaryPressed}
-            style={{ padding: spacing.md }}
+            tone={destructive ? 'danger' : 'primary'}
+            className="p-3"
           >
-            <AppText weight="bold" color={destructive ? colors.onDanger : colors.onPrimary}>
+            <AppText weight="bold" tone={destructive ? 'onDanger' : 'onPrimary'}>
               {confirmLabel}
             </AppText>
           </BigButton>
 
-          <BigButton onPress={onCancel} accessibilityLabel={t('common.cancel')} style={{ padding: spacing.md }}>
+          <BigButton onPress={onCancel} accessibilityLabel={t('common.cancel')} className="p-3">
             <AppText weight="medium">{t('common.cancel')}</AppText>
           </BigButton>
         </View>

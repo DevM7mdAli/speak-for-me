@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { I18nManager, KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-import { AppText } from '@/components/AppText';
+import { AppText, textSizeClass } from '@/components/AppText';
 import { BigButton } from '@/components/BigButton';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -11,15 +11,14 @@ import type { Phrase } from '@/data/models';
 import { phraseRepository } from '@/data/repositories';
 import { useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
-import { fontFamily, spacing, radius } from '@/theme/tokens';
-import { useTheme } from '@/theme/useTheme';
+import { useAppColors } from '@/theme/useAppColors';
 
 const SUGGESTION_LIMIT = 4;
 
 export default function TypeMessageScreen() {
   const { t } = useTranslation();
-  const { colors, bw, fs } = useTheme();
-  const { language } = useSettings();
+  const colors = useAppColors();
+  const { language, textScale } = useSettings();
   const { speakText } = useSpeech();
 
   const [text, setText] = useState('');
@@ -45,39 +44,27 @@ export default function TypeMessageScreen() {
     <Screen>
       <ScreenHeader title={t('type.title')} />
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ padding: spacing.lg, gap: spacing.lg }}
+          className="flex-1"
+          contentContainerClassName="gap-4 p-4"
           keyboardShouldPersistTaps="handled"
         >
           <TextInput
             value={text}
             onChangeText={setText}
             placeholder={t('type.placeholder')}
-            placeholderTextColor={colors.textMuted}
+            placeholderTextColorClassName="accent-muted"
             multiline
             autoFocus
             accessibilityLabel={t('a11y.textInput')}
-            style={{
-              minHeight: 140,
-              borderWidth: bw,
-              borderColor: colors.border,
-              borderRadius: radius.md,
-              backgroundColor: colors.surface,
-              color: colors.text,
-              fontFamily: fontFamily.regular,
-              fontSize: fs('lg'),
-              padding: spacing.lg,
-              textAlign: I18nManager.isRTL ? 'right' : 'left',
-              textAlignVertical: 'top',
-            }}
+            className={`min-h-40 rounded-control border-2 border-border bg-surface p-4 font-tajawal ${textSizeClass('lg', textScale)} text-foreground ltr:text-left rtl:text-right high-contrast:border-[3px]`}
           />
 
           {suggestions.length > 0 && (
-            <View style={{ gap: spacing.md }}>
+            <View className="gap-3">
               <AppText size="sm" weight="medium" muted>
                 {t('type.suggestions')}
               </AppText>
@@ -87,7 +74,7 @@ export default function TypeMessageScreen() {
                   onPress={() => setText(phrase.text[language])}
                   accessibilityLabel={phrase.text[language]}
                   minSize={64}
-                  style={{ paddingHorizontal: spacing.lg, paddingVertical: spacing.md }}
+                  className="items-start px-4 py-3"
                 >
                   <AppText weight="medium">{phrase.text[language]}</AppText>
                 </BigButton>
@@ -97,21 +84,12 @@ export default function TypeMessageScreen() {
         </ScrollView>
 
         {/* Speak stays visible above the keyboard at all times. */}
-        <View
-          style={{
-            flexDirection: 'row',
-            gap: spacing.md,
-            padding: spacing.lg,
-            borderTopWidth: bw,
-            borderTopColor: colors.border,
-            backgroundColor: colors.background,
-          }}
-        >
+        <View className="flex-row gap-3 border-t-2 border-border bg-background p-4 high-contrast:border-t-[3px]">
           <BigButton
             onPress={() => setText('')}
             accessibilityLabel={t('type.clear')}
             disabled={!text}
-            style={{ paddingHorizontal: spacing.lg }}
+            className="px-4"
           >
             <AppText weight="medium">{t('type.clear')}</AppText>
           </BigButton>
@@ -119,12 +97,11 @@ export default function TypeMessageScreen() {
             onPress={() => speakText(text.trim())}
             accessibilityLabel={t('type.speakWhatITyped')}
             disabled={!text.trim()}
-            color={colors.primary}
-            pressedColor={colors.primaryPressed}
-            style={{ flex: 1, flexDirection: 'row', gap: spacing.md }}
+            tone="primary"
+            className="flex-1 flex-row gap-3"
           >
             <MaterialCommunityIcons name="volume-high" size={32} color={colors.onPrimary} />
-            <AppText size="lg" weight="bold" color={colors.onPrimary}>
+            <AppText size="lg" weight="bold" tone="onPrimary">
               {t('common.speak')}
             </AppText>
           </BigButton>

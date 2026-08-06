@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TextInput,
+  View,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Speech from 'expo-speech';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, textSizeClass } from '@/components/AppText';
@@ -11,6 +19,7 @@ import type { Phrase } from '@/data/models';
 import { phraseRepository } from '@/data/repositories';
 import { useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
+import { useSpeechStore } from '@/store/speechStore';
 import { useAppColors } from '@/theme/useAppColors';
 
 const SUGGESTION_LIMIT = 4;
@@ -23,6 +32,12 @@ export default function TypeMessageScreen() {
 
   const [text, setText] = useState('');
   const [suggestions, setSuggestions] = useState<Phrase[]>([]);
+  const isSpeaking = useSpeechStore(
+    (state) =>
+      state.playback.language === language &&
+      state.playback.text === text.trim() &&
+      (state.playback.status === 'starting' || state.playback.status === 'speaking'),
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -60,6 +75,7 @@ export default function TypeMessageScreen() {
             multiline
             autoFocus
             accessibilityLabel={t('a11y.textInput')}
+            maxLength={Speech.maxSpeechInputLength}
             className={`min-h-40 rounded-control border-2 border-border bg-surface p-4 font-tajawal ${textSizeClass('lg', textScale)} text-foreground ltr:text-left rtl:text-right high-contrast:border-[3px]`}
           />
 
@@ -97,12 +113,18 @@ export default function TypeMessageScreen() {
             onPress={() => speakText(text.trim())}
             accessibilityLabel={t('type.speakWhatITyped')}
             disabled={!text.trim()}
+            accessibilityState={{ busy: isSpeaking }}
             tone="primary"
+            haptic={false}
             className="flex-1 flex-row gap-3"
           >
-            <MaterialCommunityIcons name="volume-high" size={32} color={colors.onPrimary} />
+            {isSpeaking ? (
+              <ActivityIndicator colorClassName="accent-on-primary" />
+            ) : (
+              <MaterialCommunityIcons name="volume-high" size={32} color={colors.onPrimary} />
+            )}
             <AppText size="lg" weight="bold" tone="onPrimary">
-              {t('common.speak')}
+              {isSpeaking ? t('speech.speaking') : t('common.speak')}
             </AppText>
           </BigButton>
         </View>

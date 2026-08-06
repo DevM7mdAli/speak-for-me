@@ -1,10 +1,11 @@
-import { Image, Pressable, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import type { Phrase } from '@/data/models';
 import { useSettings } from '@/hooks/useSettings';
+import { useSpeechStore } from '@/store/speechStore';
 import { useAppColors } from '@/theme/useAppColors';
 import { AppText } from './AppText';
 import { BigButton } from './BigButton';
@@ -33,15 +34,26 @@ export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProp
   const { language } = useSettings();
   const { t } = useTranslation();
   const text = phrase.text[language];
+  const isSpeaking = useSpeechStore(
+    (state) =>
+      state.playback.language === language &&
+      state.playback.text === text &&
+      (state.playback.status === 'starting' || state.playback.status === 'speaking'),
+  );
 
   return (
     <View className="flex-1">
       <BigButton
         onPress={() => onSpeak(phrase)}
         accessibilityLabel={t('a11y.speaks', { text })}
+        accessibilityState={{ busy: isSpeaking }}
+        tone={isSpeaking ? 'primary' : 'default'}
+        haptic={false}
         className="min-h-[132px] border-accent/35 p-3"
       >
-        {phrase.photoUri ? (
+        {isSpeaking ? (
+          <ActivityIndicator size="large" colorClassName="accent-on-primary" />
+        ) : phrase.photoUri ? (
           <Image
             source={{ uri: phrase.photoUri }}
             className="h-14 w-14 rounded-[10px]"
@@ -51,8 +63,13 @@ export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProp
         ) : (
           <MaterialCommunityIcons name={phraseIcon(phrase.iconName)} size={40} color={colors.accent} />
         )}
-        <AppText size="md" weight="medium" className="mt-2 text-center">
-          {text}
+        <AppText
+          size="md"
+          weight="medium"
+          tone={isSpeaking ? 'onPrimary' : 'default'}
+          className="mt-2 text-center"
+        >
+          {isSpeaking ? t('speech.speaking') : text}
         </AppText>
       </BigButton>
 

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { FlatList, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -8,10 +8,12 @@ import { AppText } from '@/components/AppText';
 import { BigButton } from '@/components/BigButton';
 import { RestartOverlay } from '@/components/RestartOverlay';
 import { Screen } from '@/components/Screen';
+import { SpeechStatusBanner } from '@/components/SpeechStatusBanner';
 import { phraseIcon } from '@/components/PhraseTile';
 import { useLanguageSwitch, useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
 import { usePhraseStore } from '@/store/phraseStore';
+import { useSpeechStore } from '@/store/speechStore';
 import { useAppColors } from '@/theme/useAppColors';
 
 const EMERGENCY_CATEGORY_ID = 'emergency';
@@ -35,6 +37,11 @@ export default function HomeScreen() {
   const categories = usePhraseStore((s) => s.categories);
   const emergencyPhrases = usePhraseStore((s) => s.phrasesByCategory[EMERGENCY_CATEGORY_ID]);
   const loadCategory = usePhraseStore((s) => s.loadCategory);
+  const emergencySpeaking = useSpeechStore(
+    (state) =>
+      state.playback.emergency &&
+      (state.playback.status === 'starting' || state.playback.status === 'speaking'),
+  );
 
   useEffect(() => {
     loadCategory(EMERGENCY_CATEGORY_ID);
@@ -43,9 +50,9 @@ export default function HomeScreen() {
   const speakCallNurse = () => {
     const nurseCall = emergencyPhrases?.[0];
     if (nurseCall) {
-      speakPhrase(nurseCall);
+      speakPhrase(nurseCall, { emergency: true });
     } else {
-      speakText(t('home.callNurse'));
+      speakText(t('home.callNurse'), language, { emergency: true });
     }
   };
 
@@ -106,15 +113,23 @@ export default function HomeScreen() {
         <BigButton
           onPress={speakCallNurse}
           accessibilityLabel={t('a11y.emergencyButton')}
+          accessibilityState={{ busy: emergencySpeaking }}
           tone="danger"
+          haptic={false}
           className="flex-row gap-3 py-4"
         >
-          <MaterialCommunityIcons name="bell-alert" size={40} color={colors.onDanger} />
+          {emergencySpeaking ? (
+            <ActivityIndicator size="large" colorClassName="accent-on-danger" />
+          ) : (
+            <MaterialCommunityIcons name="bell-alert" size={40} color={colors.onDanger} />
+          )}
           <AppText size="xl" weight="bold" tone="onDanger">
-            {t('home.callNurse')}
+            {emergencySpeaking ? t('speech.speaking') : t('home.callNurse')}
           </AppText>
         </BigButton>
       </View>
+
+      <SpeechStatusBanner />
 
       <FlatList
         data={tiles}

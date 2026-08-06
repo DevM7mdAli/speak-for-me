@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import * as Speech from 'expo-speech';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
@@ -11,9 +10,8 @@ import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { RestartOverlay } from '@/components/RestartOverlay';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import type { AppLanguage } from '@/i18n';
+import { SpeechHealthPanel } from '@/components/SpeechHealthPanel';
 import { useLanguageSwitch, useSettings } from '@/hooks/useSettings';
-import { useSpeech } from '@/hooks/useSpeech';
 import type { Phrase } from '@/data/models';
 import { usePhraseStore } from '@/store/phraseStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -68,72 +66,6 @@ function OptionButton({
   );
 }
 
-function VoicePicker({ language }: { language: AppLanguage }) {
-  const { t } = useTranslation();
-  const settings = useSettings();
-  const update = useSettingsStore((s) => s.update);
-  const [voices, setVoices] = useState<Speech.Voice[]>([]);
-  const [expanded, setExpanded] = useState(false);
-  const colors = useAppColors();
-
-  useEffect(() => {
-    Speech.getAvailableVoicesAsync().then((all) =>
-      setVoices(all.filter((v) => v.language.toLowerCase().startsWith(language))),
-    );
-  }, [language]);
-
-  const selectedId = settings.preferredVoiceId[language];
-  const selectedName = voices.find((v) => v.identifier === selectedId)?.name ?? t('settings.systemDefault');
-  const label = language === 'en' ? t('settings.voiceEn') : t('settings.voiceAr');
-
-  const choose = (identifier?: string) => {
-    update({ preferredVoiceId: { ...settings.preferredVoiceId, [language]: identifier } });
-    setExpanded(false);
-  };
-
-  return (
-    <View className="gap-3">
-      <BigButton
-        onPress={() => setExpanded((e) => !e)}
-        accessibilityLabel={`${label}: ${selectedName}`}
-        accessibilityState={{ expanded }}
-        minSize={64}
-        className="flex-row gap-3 px-4"
-      >
-        <AppText weight="medium" className="flex-1">
-          {label}
-        </AppText>
-        <AppText muted numberOfLines={1} className="max-w-36">
-          {selectedName}
-        </AppText>
-        <MaterialCommunityIcons
-          name={expanded ? 'chevron-up' : 'chevron-down'}
-          size={28}
-          color={colors.muted}
-        />
-      </BigButton>
-
-      {expanded && (
-        <View className="gap-3 ps-4">
-          <OptionButton
-            label={t('settings.systemDefault')}
-            selected={!selectedId}
-            onPress={() => choose(undefined)}
-          />
-          {voices.map((voice) => (
-            <OptionButton
-              key={voice.identifier}
-              label={voice.name}
-              selected={voice.identifier === selectedId}
-              onPress={() => choose(voice.identifier)}
-            />
-          ))}
-        </View>
-      )}
-    </View>
-  );
-}
-
 export default function SettingsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -142,7 +74,6 @@ export default function SettingsScreen() {
   const update = useSettingsStore((s) => s.update);
   const resetSettings = useSettingsStore((s) => s.reset);
   const { restarting, switchLanguage } = useLanguageSwitch();
-  const { speakText } = useSpeech();
   const { restartPinSetup } = useSettingsGate();
 
   const customPhrases = usePhraseStore(
@@ -246,17 +177,7 @@ export default function SettingsScreen() {
               />
             ))}
           </View>
-          <VoicePicker language="en" />
-          <VoicePicker language="ar" />
-          <BigButton
-            onPress={() => speakText(t('settings.testSentence'))}
-            accessibilityLabel={t('settings.testVoice')}
-            minSize={64}
-            className="flex-row gap-3 px-4"
-          >
-            <MaterialCommunityIcons name="volume-high" size={28} color={colors.primary} />
-            <AppText weight="medium">{t('settings.testVoice')}</AppText>
-          </BigButton>
+          <SpeechHealthPanel />
         </Section>
 
         <Section title={t('settings.phrases')}>

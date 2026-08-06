@@ -42,6 +42,8 @@ export interface AppSettings {
   preferredVoiceId: { en?: string; ar?: string };
   /** 0.5–1.0; default slower than normal for clarity. */
   speechRate: number;
+  /** Last time a caregiver physically confirmed audible speech per language. */
+  speechCheckConfirmedAt: { en?: string; ar?: string };
   /** SHA-256 hash; unset until the caregiver first opens settings. */
   caregiverPinHash?: string;
 }
@@ -52,6 +54,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   highContrast: false,
   preferredVoiceId: {},
   speechRate: 0.85,
+  speechCheckConfirmedAt: {},
 };
 
 /** Fields a caregiver provides when creating or editing a phrase. */

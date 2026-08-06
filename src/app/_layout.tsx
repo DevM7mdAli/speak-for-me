@@ -2,7 +2,7 @@ import '@/i18n';
 import '@/global.css';
 
 import { useEffect, useState } from 'react';
-import { I18nManager, Platform } from 'react-native';
+import { AppState, I18nManager, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Updates from 'expo-updates';
@@ -16,8 +16,10 @@ import {
 import { SafeAreaListener } from 'react-native-safe-area-context';
 import { Uniwind } from 'uniwind';
 
+import { SpeechFeedbackOverlay } from '@/components/SpeechFeedbackOverlay';
 import { usePhraseStore } from '@/store/phraseStore';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useSpeechStore } from '@/store/speechStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,6 +36,7 @@ export default function RootLayout() {
   });
   const [dataReady, setDataReady] = useState(false);
   const highContrast = useSettingsStore((state) => state.settings.highContrast);
+  const checkSpeechCapabilities = useSpeechStore((state) => state.checkCapabilities);
 
   useEffect(() => {
     async function boot() {
@@ -67,6 +70,21 @@ export default function RootLayout() {
     Uniwind.setTheme(highContrast ? 'high-contrast' : 'light');
   }, [highContrast]);
 
+  useEffect(() => {
+    if (!dataReady) return;
+
+    void checkSpeechCapabilities();
+    let previousState = AppState.currentState;
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active' && previousState !== 'active') {
+        void checkSpeechCapabilities();
+      }
+      previousState = nextState;
+    });
+
+    return () => subscription.remove();
+  }, [checkSpeechCapabilities, dataReady]);
+
   if (!fontsLoaded || !dataReady) {
     return null;
   }
@@ -75,6 +93,7 @@ export default function RootLayout() {
     <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
       <StatusBar style={highContrast ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false }} />
+      <SpeechFeedbackOverlay />
     </SafeAreaListener>
   );
 }

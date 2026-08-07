@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -82,30 +82,41 @@ export default function HomeScreen() {
 
   return (
     <Screen>
-      <View className="flex-row items-center gap-3 px-4 py-2">
-        <AppText size="lg" weight="bold" className="flex-1" accessibilityRole="header">
-          {t('app.name')}
-        </AppText>
-
-        <BigButton
-          onPress={() => switchLanguage(language === 'en' ? 'ar' : 'en')}
-          accessibilityLabel={t('a11y.languageToggle')}
-          accessibilityHint={t('language.toggleHint')}
-          minSize={64}
-          className="px-4"
-        >
-          <AppText weight="bold" tone="primary">
-            {t('language.switchTo')}
+      <View className="gap-2 px-4 py-2">
+        <View className="flex-row items-center gap-3">
+          <Image
+            source={require('../../assets/images/app-icon-v2.png')}
+            className="h-12 w-12 rounded-[8px]"
+            resizeMode="contain"
+            accessible={false}
+            accessibilityIgnoresInvertColors
+          />
+          <AppText size="lg" weight="bold" className="flex-1" accessibilityRole="header">
+            {t('app.name')}
           </AppText>
-        </BigButton>
+        </View>
 
-        <BigButton
-          onPress={() => router.push('/settings')}
-          accessibilityLabel={t('a11y.openSettings')}
-          minSize={64}
-        >
-          <MaterialCommunityIcons name="cog" size={30} color={colors.muted} />
-        </BigButton>
+        <View className="flex-row gap-3">
+          <BigButton
+            onPress={() => switchLanguage(language === 'en' ? 'ar' : 'en')}
+            accessibilityLabel={t('a11y.languageToggle')}
+            accessibilityHint={t('language.toggleHint')}
+            minSize={64}
+            className="flex-1 px-4"
+          >
+            <AppText weight="bold" tone="primary">
+              {t('language.switchTo')}
+            </AppText>
+          </BigButton>
+
+          <BigButton
+            onPress={() => router.push('/settings')}
+            accessibilityLabel={t('a11y.openSettings')}
+            minSize={64}
+          >
+            <MaterialCommunityIcons name="cog" size={30} color={colors.muted} />
+          </BigButton>
+        </View>
       </View>
 
       {/* Emergency: one tap, always visible, never behind a scroll. */}
@@ -143,7 +154,13 @@ export default function HomeScreen() {
             accessibilityLabel={item.a11yLabel}
             className="min-h-36 flex-1 border-accent/30 p-3"
           >
-            <MaterialCommunityIcons name={phraseIcon(item.iconName)} size={44} color={colors.accent} />
+            <View className="h-16 w-16 items-center justify-center rounded-full bg-background">
+              <MaterialCommunityIcons
+                name={phraseIcon(item.iconName)}
+                size={38}
+                color={colors.accent}
+              />
+            </View>
             <AppText size="md" weight="medium" className="mt-2 text-center">
               {item.label}
             </AppText>

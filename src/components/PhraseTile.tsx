@@ -59,9 +59,16 @@ export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProp
             className="h-14 w-14 rounded-[10px]"
             resizeMode="cover"
             accessibilityLabel={t('a11y.photoOfPhrase')}
+            accessibilityIgnoresInvertColors
           />
         ) : (
-          <MaterialCommunityIcons name={phraseIcon(phrase.iconName)} size={40} color={colors.accent} />
+          <View className="h-16 w-16 items-center justify-center rounded-full bg-background">
+            <MaterialCommunityIcons
+              name={phraseIcon(phrase.iconName)}
+              size={36}
+              color={colors.accent}
+            />
+          </View>
         )}
         <AppText
           size="md"

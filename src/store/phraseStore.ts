@@ -26,6 +26,7 @@ interface PhraseState {
   createPhrase: (input: PhraseInput) => Promise<void>;
   updatePhrase: (id: string, input: PhraseInput) => Promise<void>;
   deletePhrase: (phrase: Phrase) => Promise<void>;
+  clearPatientContent: () => Promise<void>;
   resetToSeed: () => Promise<void>;
 }
 
@@ -91,6 +92,12 @@ export const usePhraseStore = create<PhraseState>((set, get) => ({
   deletePhrase: async (phrase) => {
     await phraseRepository.deletePhrase(phrase.id);
     await Promise.all([get().loadCategory(phrase.categoryId), get().loadMyPhrases()]);
+  },
+
+  clearPatientContent: async () => {
+    await phraseRepository.clearPatientContent();
+    set({ phrasesByCategory: {}, recentlyUsed: [], favorites: [] });
+    await get().loadCategories();
   },
 
   resetToSeed: async () => {

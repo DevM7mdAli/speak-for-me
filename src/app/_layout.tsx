@@ -1,4 +1,3 @@
-import '@/i18n';
 import '@/global.css';
 
 import { useEffect, useState } from 'react';
@@ -74,7 +73,7 @@ export default function RootLayout() {
   });
   const [dataReady, setDataReady] = useState(false);
   const [needsManualRestart, setNeedsManualRestart] = useState(false);
-  const highContrast = useSettingsStore((state) => state.settings.highContrast);
+  const theme = useSettingsStore((state) => state.settings.theme);
   const checkSpeechCapabilities = useSpeechStore((state) => state.checkCapabilities);
 
   useEffect(() => {
@@ -136,8 +135,8 @@ export default function RootLayout() {
   }, [fontsLoaded, dataReady]);
 
   useEffect(() => {
-    Uniwind.setTheme(highContrast ? 'high-contrast' : 'light');
-  }, [highContrast]);
+    Uniwind.setTheme(theme);
+  }, [theme]);
 
   useEffect(() => {
     if (!dataReady) return;
@@ -162,7 +161,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
-      <StatusBar style={highContrast ? 'light' : 'dark'} />
+      <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
       <Stack screenOptions={{ headerShown: false }} />
       <SpeechFeedbackOverlay />
       <ManualRestartNotice

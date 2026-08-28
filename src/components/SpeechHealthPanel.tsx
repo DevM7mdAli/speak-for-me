@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Linking as NativeLinking, Platform, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
@@ -82,7 +82,8 @@ function SpeechLanguageSection({ language }: { language: AppLanguage }) {
   const { speakText } = useSpeech();
   const [expanded, setExpanded] = useState(false);
   const [testRequestId, setTestRequestId] = useState<number>();
-  const [confirmPending, setConfirmPending] = useState(false);
+  /** The test the caregiver has already answered "heard" or "no sound" for. */
+  const [answeredRequestId, setAnsweredRequestId] = useState<number>();
   const [reportedNoSound, setReportedNoSound] = useState(false);
 
   const languageName = t(language === 'en' ? 'settings.english' : 'settings.arabic');
@@ -97,23 +98,17 @@ function SpeechLanguageSection({ language }: { language: AppLanguage }) {
     (playback.status === 'starting' || playback.status === 'speaking');
   const confirmedAt = settings.speechCheckConfirmedAt[language];
 
-  useEffect(() => {
-    if (testRequestId === undefined) return;
-    if (playback.requestId > testRequestId) {
-      setTestRequestId(undefined);
-      return;
-    }
-    if (playback.requestId !== testRequestId) return;
-    if (playback.status === 'done') {
-      setTestRequestId(undefined);
-      setConfirmPending(true);
-    } else if (playback.status === 'error') {
-      setTestRequestId(undefined);
-    }
-  }, [playback, testRequestId]);
+  // Derived during render rather than pushed into state from an effect:
+  // the question "has this test finished and not yet been answered?" is a
+  // function of the playback the component is already reading.
+  const confirmPending =
+    testRequestId !== undefined &&
+    playback.requestId === testRequestId &&
+    playback.status === 'done' &&
+    answeredRequestId !== testRequestId;
 
   const chooseVoice = async (identifier?: string) => {
-    setConfirmPending(false);
+    setTestRequestId(undefined);
     setReportedNoSound(false);
     await update({
       preferredVoiceId: { ...settings.preferredVoiceId, [language]: identifier },
@@ -127,7 +122,6 @@ function SpeechLanguageSection({ language }: { language: AppLanguage }) {
   };
 
   const runTest = () => {
-    setConfirmPending(false);
     setReportedNoSound(false);
     void speakText(testSentence, language);
     setTestRequestId(useSpeechStore.getState().playback.requestId);
@@ -140,7 +134,7 @@ function SpeechLanguageSection({ language }: { language: AppLanguage }) {
         [language]: new Date().toISOString(),
       },
     });
-    setConfirmPending(false);
+    setAnsweredRequestId(testRequestId);
     setReportedNoSound(false);
   };
 
@@ -151,7 +145,7 @@ function SpeechLanguageSection({ language }: { language: AppLanguage }) {
         [language]: undefined,
       },
     });
-    setConfirmPending(false);
+    setAnsweredRequestId(testRequestId);
     setReportedNoSound(true);
   };
 

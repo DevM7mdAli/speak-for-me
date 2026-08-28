@@ -1,5 +1,7 @@
 import type { SpeechLanguageMode } from '@/i18n/speechLanguage';
 
+export type AppTheme = 'light' | 'dark' | 'high-contrast';
+
 /** Text that must exist in every supported language — no partial content. */
 export interface LocalizedText {
   en: string;
@@ -49,7 +51,11 @@ export interface AppSettings {
   speechLanguageLead: 'en' | 'ar';
   /** 1.0 default, up to 1.6. */
   textScale: number;
-  highContrast: boolean;
+  /**
+   * Chosen by the caregiver, never followed from the OS: a bay is bright
+   * by day and dark at night regardless of what the phone thinks.
+   */
+  theme: AppTheme;
   preferredVoiceId: { en?: string; ar?: string };
   /** 0.5–1.0; default slower than normal for clarity. */
   speechRate: number;
@@ -66,7 +72,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   speechLanguage: 'follow',
   speechLanguageLead: 'en',
   textScale: 1.0,
-  highContrast: false,
+  theme: 'light',
   preferredVoiceId: {},
   speechRate: 0.85,
   speechCheckConfirmedAt: {},

@@ -3,6 +3,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { resolveSpeechLanguages } from '@/i18n/speechLanguage';
+import { useAnnounce } from '@/hooks/useAnnounce';
 import { useSettings } from '@/hooks/useSettings';
 import { useSpeechStore } from '@/store/speechStore';
 import { useAppColors } from '@/theme/useAppColors';
@@ -29,16 +30,19 @@ export function SpeechStatusBanner() {
     return capability.status !== 'ready' || !settings.speechCheckConfirmedAt[language];
   });
 
-  if (!problem) return null;
-
-  const capability = capabilities[problem];
+  const capability = problem ? capabilities[problem] : undefined;
   const languageName = t(problem === 'en' ? 'settings.english' : 'settings.arabic');
-  const message =
-    capability.status === 'unavailable'
+  const message = !capability
+    ? undefined
+    : capability.status === 'unavailable'
       ? t('speech.statusUnavailable', { language: languageName })
       : capability.status === 'degraded'
         ? t('speech.statusDegraded')
         : t('speech.needsConfirmation');
+
+  useAnnounce(message);
+
+  if (!message) return null;
 
   return (
     <View

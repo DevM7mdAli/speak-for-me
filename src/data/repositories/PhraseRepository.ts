@@ -26,6 +26,13 @@ export interface PhraseRepository {
   updatePhrase(id: string, input: PhraseInput): Promise<void>;
   deletePhrase(id: string): Promise<void>;
 
+  /**
+   * Clear everything belonging to the previous patient — custom phrases,
+   * favourites, usage history — while leaving the device's own setup
+   * (PIN, chosen voices, confirmed sound) intact for the next one.
+   */
+  clearPatientContent(): Promise<void>;
+
   /** Wipe custom content and restore the built-in seed. */
   resetToSeed(): Promise<void>;
 }

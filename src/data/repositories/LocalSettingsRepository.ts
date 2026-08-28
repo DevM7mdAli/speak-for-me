@@ -1,5 +1,6 @@
 import { getDatabase } from '../database';
 import { DEFAULT_SETTINGS, type AppSettings } from '../models';
+import { migrateSettings } from '../settingsMigration';
 import type { SettingsRepository } from './SettingsRepository';
 
 const SETTINGS_KEY = 'app_settings';
@@ -15,7 +16,7 @@ export class LocalSettingsRepository implements SettingsRepository {
       return { ...DEFAULT_SETTINGS };
     }
     try {
-      return { ...DEFAULT_SETTINGS, ...(JSON.parse(row.value) as Partial<AppSettings>) };
+      return migrateSettings(JSON.parse(row.value));
     } catch {
       return { ...DEFAULT_SETTINGS };
     }

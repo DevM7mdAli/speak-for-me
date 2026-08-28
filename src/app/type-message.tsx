@@ -8,7 +8,6 @@ import {
   View,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Speech from 'expo-speech';
 import { useTranslation } from 'react-i18next';
 
 import { AppText, textSizeClass } from '@/components/AppText';
@@ -20,6 +19,7 @@ import type { Phrase } from '@/data/models';
 import { phraseRepository } from '@/data/repositories';
 import { useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
+import { MAX_UTTERANCE_CHARS } from '@/store/speechLimits';
 import { useSpeechStore } from '@/store/speechStore';
 import { useAppColors } from '@/theme/useAppColors';
 
@@ -78,7 +78,7 @@ export default function TypeMessageScreen() {
             multiline
             autoFocus
             accessibilityLabel={t('a11y.textInput')}
-            maxLength={Speech.maxSpeechInputLength}
+            maxLength={MAX_UTTERANCE_CHARS}
             className={`min-h-40 rounded-control border-2 border-border bg-surface p-4 font-tajawal ${textSizeClass('lg', textScale)} text-foreground ltr:text-left rtl:text-right high-contrast:border-[3px]`}
           />
 

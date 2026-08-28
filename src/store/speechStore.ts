@@ -4,6 +4,7 @@ import * as Speech from 'expo-speech';
 import { create } from 'zustand';
 
 import { SPEECH_LOCALES, type AppLanguage } from '@/i18n';
+import { MAX_UTTERANCE_CHARS, finishTimeoutFor } from './speechLimits';
 import { useSettingsStore } from '@/store/settingsStore';
 
 export type SpeechCapabilityStatus = 'checking' | 'ready' | 'degraded' | 'unavailable';
@@ -89,8 +90,6 @@ const SPEECH_START_TIMEOUT_MS = 5000;
  * was said and then let the engine say it anyway.
  */
 const COLD_START_TIMEOUT_MS = 12000;
-const MIN_SPEECH_FINISH_TIMEOUT_MS = 10000;
-const MAX_SPEECH_FINISH_TIMEOUT_MS = 45000;
 
 let requestSequence = 0;
 /** True once any utterance has reached onStart in this process. */
@@ -221,10 +220,7 @@ function speakPart(
           startTimer = undefined;
           set({ playback: { ...get().playback, status: 'speaking' } });
 
-          const estimated = Math.min(
-            MAX_SPEECH_FINISH_TIMEOUT_MS,
-            Math.max(MIN_SPEECH_FINISH_TIMEOUT_MS, part.text.length * 350),
-          );
+          const estimated = finishTimeoutFor(part.text, settings.speechRate);
           finishTimer = setTimeout(() => {
             settle({ spoken: false, error: 'finish-timeout' });
             void Speech.stop();
@@ -399,7 +395,7 @@ export const useSpeechStore = create<SpeechState>((set, get) => ({
       return false;
     }
 
-    if (usable.some((part) => part.text.length > Speech.maxSpeechInputLength)) {
+    if (usable.some((part) => part.text.length > MAX_UTTERANCE_CHARS)) {
       fail('text-too-long');
       return false;
     }

@@ -8,7 +8,8 @@
     "typeMessage": "Type a message",
     "myPhrases": "My phrases",
     "savedPhrases": "Favorites and recent",
-    "customWords": "Custom words"
+    "customWords": "Custom words",
+    "speaksAloudOnly": "Speaks out loud on this phone. Does not alert staff."
   },
   "common": {
     "back": "Back",
@@ -78,7 +79,10 @@
     "confirm": "Enter the same PIN again to confirm",
     "wrong": "Wrong PIN. Try again.",
     "mismatch": "PINs did not match. Start again.",
-    "deleteDigit": "Delete last digit"
+    "deleteDigit": "Delete last digit",
+    "enterCurrent": "Enter the current PIN to change it",
+    "lockedFor": "Too many attempts. Try again in {{seconds}} seconds.",
+    "forgotten": "Forgot the PIN? Caregiver settings are stored on this device only. Reinstalling the app clears them — along with any custom phrases and photos."
   },
   "settings": {
     "title": "Caregiver settings",
@@ -105,7 +109,21 @@
     "resetTitle": "Reset everything?",
     "resetBody": "This deletes all custom phrases, favorites, and settings. This cannot be undone.",
     "resetConfirm": "Yes, reset everything",
-    "changePin": "Change PIN"
+    "changePin": "Change PIN",
+    "theme": "Screen theme",
+    "themeLight": "Light",
+    "themeDark": "Night",
+    "themeContrast": "High contrast",
+    "themeHint": "Night suits a darkened bay. High contrast is for low vision.",
+    "handover": "New patient",
+    "newPatient": "Prepare for a new patient",
+    "newPatientHint": "Clears the previous patient’s phrases, favourites and history. Keeps the PIN, voices and sound check so the device stays ready.",
+    "newPatientTitle": "Prepare for a new patient?",
+    "newPatientBody": "Custom phrases, favourites and recent history will be deleted. Device setup is kept.",
+    "newPatientConfirm": "Yes, clear patient content",
+    "about": "About this app",
+    "notANurseCallTitle": "This is not a nurse-call system",
+    "notANurseCallBody": "The red buttons speak a phrase out loud on this device. They do not alert staff, page anyone, or connect to hospital systems. Keep the patient on the ward’s own call system."
   },
   "editPhrase": {
     "titleNew": "New phrase",

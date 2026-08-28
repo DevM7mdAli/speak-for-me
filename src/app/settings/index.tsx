@@ -82,7 +82,9 @@ export default function SettingsScreen() {
   );
   const loadCategory = usePhraseStore((s) => s.loadCategory);
   const resetToSeed = usePhraseStore((s) => s.resetToSeed);
+  const clearPatientContent = usePhraseStore((s) => s.clearPatientContent);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmNewPatient, setConfirmNewPatient] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -96,6 +98,12 @@ export default function SettingsScreen() {
       Math.max(TEXT_SCALE_MIN, Math.round((settings.textScale + delta) * 10) / 10),
     );
     update({ textScale: next });
+  };
+
+  const handleNewPatient = async () => {
+    setConfirmNewPatient(false);
+    await clearPatientContent();
+    router.back();
   };
 
   const handleReset = async () => {
@@ -150,21 +158,27 @@ export default function SettingsScreen() {
             </BigButton>
           </View>
 
-          <BigButton
-            onPress={() => update({ highContrast: !settings.highContrast })}
-            accessibilityLabel={t('settings.highContrast')}
-            accessibilityRole="switch"
-            accessibilityState={{ checked: settings.highContrast }}
-            minSize={64}
-            className="flex-row gap-3 px-4"
-          >
-            <AppText weight="medium" className="flex-1">
-              {t('settings.highContrast')}
-            </AppText>
-            <AppText weight="bold" tone={settings.highContrast ? 'success' : 'muted'}>
-              {settings.highContrast ? t('settings.on') : t('settings.off')}
-            </AppText>
-          </BigButton>
+          <AppText weight="medium">{t('settings.theme')}</AppText>
+          <View className="flex-row gap-3">
+            <OptionButton
+              label={t('settings.themeLight')}
+              selected={settings.theme === 'light'}
+              onPress={() => update({ theme: 'light' })}
+            />
+            <OptionButton
+              label={t('settings.themeDark')}
+              selected={settings.theme === 'dark'}
+              onPress={() => update({ theme: 'dark' })}
+            />
+            <OptionButton
+              label={t('settings.themeContrast')}
+              selected={settings.theme === 'high-contrast'}
+              onPress={() => update({ theme: 'high-contrast' })}
+            />
+          </View>
+          <AppText size="sm" muted>
+            {t('settings.themeHint')}
+          </AppText>
         </Section>
 
         <Section title={t('speechLanguage.title')}>
@@ -266,6 +280,29 @@ export default function SettingsScreen() {
           ))}
         </Section>
 
+        <Section title={t('settings.handover')}>
+          <AppText size="sm" muted>
+            {t('settings.newPatientHint')}
+          </AppText>
+          <BigButton
+            onPress={() => setConfirmNewPatient(true)}
+            accessibilityLabel={t('settings.newPatient')}
+            minSize={64}
+            className="px-4"
+          >
+            <AppText weight="medium">{t('settings.newPatient')}</AppText>
+          </BigButton>
+        </Section>
+
+        <Section title={t('settings.about')}>
+          <View className="gap-2 border-2 border-border p-4 high-contrast:border-[3px]">
+            <AppText weight="bold">{t('settings.notANurseCallTitle')}</AppText>
+            <AppText size="sm" muted>
+              {t('settings.notANurseCallBody')}
+            </AppText>
+          </View>
+        </Section>
+
         <Section title={t('settings.danger')}>
           <BigButton
             onPress={restartPinSetup}
@@ -290,6 +327,15 @@ export default function SettingsScreen() {
         </Section>
       </ScrollView>
 
+      <ConfirmDialog
+        visible={confirmNewPatient}
+        title={t('settings.newPatientTitle')}
+        body={t('settings.newPatientBody')}
+        confirmLabel={t('settings.newPatientConfirm')}
+        destructive
+        onConfirm={handleNewPatient}
+        onCancel={() => setConfirmNewPatient(false)}
+      />
       <ConfirmDialog
         visible={confirmReset}
         title={t('settings.resetTitle')}

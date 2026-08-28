@@ -1,14 +1,22 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Stack } from 'expo-router';
 import * as Crypto from 'expo-crypto';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
+import { AppText } from '@/components/AppText';
 import { PinPad } from '@/components/PinPad';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { useAnnounce } from '@/hooks/useAnnounce';
 import { useSettings } from '@/hooks/useSettings';
+import {
+  emptyLockout,
+  lockoutRemainingMs,
+  registerFailure,
+  type PinLockout,
+} from '@/security/pinLockout';
 import { useSettingsStore } from '@/store/settingsStore';
 
 export async function hashPin(pin: string): Promise<string> {
@@ -16,63 +24,121 @@ export async function hashPin(pin: string): Promise<string> {
 }
 
 interface SettingsGate {
-  /** Re-locks the gate and starts the create-PIN flow (used by "Change PIN"). */
+  /** Re-locks the gate and starts the change-PIN flow. */
   restartPinSetup: () => void;
 }
 
 const GateContext = createContext<SettingsGate>({ restartPinSetup: () => {} });
 export const useSettingsGate = () => useContext(GateContext);
 
-type Stage = 'enter' | 'create' | 'confirm';
-
 /**
- * Everything under /settings sits behind a 4-digit caregiver PIN.
- * First visit creates the PIN (enter twice); later visits verify it.
+ * `verify` — prove the existing PIN to get in.
+ * `create` / `confirm` — set a new one, entered twice.
+ *
+ * Changing an existing PIN starts at `verify`, so walking away mid-change
+ * cannot leave the app on a screen where anyone present can set a new PIN
+ * and lock the real caregiver out.
  */
+type Stage = 'verify' | 'create' | 'confirm';
+
 export default function SettingsLayout() {
   const { t } = useTranslation();
   const settings = useSettings();
   const update = useSettingsStore((s) => s.update);
 
   const [unlocked, setUnlocked] = useState(false);
-  const [stage, setStage] = useState<Stage>(settings.caregiverPinHash ? 'enter' : 'create');
+  const [changing, setChanging] = useState(false);
+  const [stage, setStage] = useState<Stage>(settings.caregiverPinHash ? 'verify' : 'create');
   const [firstPin, setFirstPin] = useState('');
   const [error, setError] = useState<string>();
+  const [lockout, setLockout] = useState<PinLockout>(emptyLockout);
+  const [now, setNow] = useState(() => Date.now());
+
+  const remainingMs = lockoutRemainingMs(lockout, now);
+  const locked = remainingMs > 0;
+
+  // Ticks only while a delay is running.
+  useEffect(() => {
+    if (!locked) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [locked]);
+
+  const lockMessage = locked
+    ? t('pin.lockedFor', { seconds: Math.ceil(remainingMs / 1000) })
+    : undefined;
+  useAnnounce(error ?? lockMessage);
 
   const handleComplete = async (pin: string) => {
+    if (locked) return;
     setError(undefined);
-    if (stage === 'enter') {
+
+    if (stage === 'verify') {
       if ((await hashPin(pin)) === settings.caregiverPinHash) {
-        setUnlocked(true);
-      } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        setError(t('pin.wrong'));
+        setLockout(emptyLockout());
+        if (changing) {
+          setStage('create');
+        } else {
+          setUnlocked(true);
+        }
+        return;
       }
-    } else if (stage === 'create') {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      const next = registerFailure(lockout, Date.now());
+      setLockout(next);
+      setNow(Date.now());
+      setError(t('pin.wrong'));
+      return;
+    }
+
+    if (stage === 'create') {
       setFirstPin(pin);
       setStage('confirm');
-    } else {
-      if (pin === firstPin) {
-        await update({ caregiverPinHash: await hashPin(pin) });
-        setUnlocked(true);
-        setStage('enter');
-      } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        setError(t('pin.mismatch'));
-        setStage('create');
-      }
-      setFirstPin('');
+      return;
     }
+
+    if (pin === firstPin) {
+      await update({ caregiverPinHash: await hashPin(pin) });
+      setUnlocked(true);
+      setChanging(false);
+      setStage('verify');
+    } else {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      setError(t('pin.mismatch'));
+      setStage('create');
+    }
+    setFirstPin('');
   };
 
   if (!unlocked) {
-    const prompt =
-      stage === 'enter' ? t('pin.enter') : stage === 'create' ? t('pin.create') : t('pin.confirm');
+    const prompt = locked
+      ? t('pin.lockedFor', { seconds: Math.ceil(remainingMs / 1000) })
+      : stage === 'verify'
+        ? changing
+          ? t('pin.enterCurrent')
+          : t('pin.enter')
+        : stage === 'create'
+          ? t('pin.create')
+          : t('pin.confirm');
+
     return (
       <Screen>
         <ScreenHeader title={t('pin.title')} />
-        <View className="flex-1 justify-center p-4">
-          <PinPad prompt={prompt} error={error} onComplete={handleComplete} />
+        <View className="flex-1 justify-center gap-6 p-4">
+          <PinPad
+            prompt={prompt}
+            error={locked ? undefined : error}
+            disabled={locked}
+            onComplete={handleComplete}
+          />
+          {/* Shown once mistakes are adding up: a lost PIN must have a way
+              out, and the honest one is that caregiver settings live on
+              this device only. */}
+          {lockout.failedAttempts >= 2 && (
+            <AppText size="sm" muted className="text-center">
+              {t('pin.forgotten')}
+            </AppText>
+          )}
         </View>
       </Screen>
     );
@@ -83,8 +149,11 @@ export default function SettingsLayout() {
       value={{
         restartPinSetup: () => {
           setUnlocked(false);
-          setStage('create');
           setError(undefined);
+          setFirstPin('');
+          // Prove the current PIN before setting a new one.
+          setChanging(Boolean(settings.caregiverPinHash));
+          setStage(settings.caregiverPinHash ? 'verify' : 'create');
         },
       }}
     >

@@ -196,6 +196,13 @@ export default function HomeScreen() {
             {t('home.breathingEmergency')}
           </AppText>
         </BigButton>
+        {/* The button speaks; it does not summon anyone. Saying so where
+            the button is avoids the assumption that this replaces the
+            ward's call system, without making the button's own label
+            longer for a distressed patient to read. */}
+        <AppText size="sm" muted className="text-center">
+          {t('home.speaksAloudOnly')}
+        </AppText>
       </View>
 
       <SpeechStatusBanner />

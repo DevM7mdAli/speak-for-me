@@ -197,6 +197,16 @@ export class LocalPhraseRepository implements PhraseRepository {
     await db.runAsync('DELETE FROM phrases WHERE id = ?', [id]);
   }
 
+  async clearPatientContent(): Promise<void> {
+    const db = await this.db();
+    await db.withExclusiveTransactionAsync(async (tx) => {
+      await tx.execAsync(
+        `DELETE FROM phrases WHERE is_custom = 1;
+         UPDATE phrases SET is_favorite = 0, last_used_at = NULL;`,
+      );
+    });
+  }
+
   async resetToSeed(): Promise<void> {
     const db = await this.db();
     await db.withExclusiveTransactionAsync(async (tx) => {

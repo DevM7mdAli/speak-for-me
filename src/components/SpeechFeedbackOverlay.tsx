@@ -2,6 +2,7 @@ import { Modal, ScrollView, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
+import { useAnnounce } from '@/hooks/useAnnounce';
 import { useSpeech } from '@/hooks/useSpeech';
 import { speechOverlayMode } from '@/store/speechOverlay';
 import { useSpeechStore } from '@/store/speechStore';
@@ -29,6 +30,14 @@ export function SpeechFeedbackOverlay() {
   const mode = speechOverlayMode(playback);
   const failed = mode === 'failed';
   const emergency = playback.emergency;
+
+  // accessibilityLiveRegion is Android-only; announce explicitly so a
+  // caregiver using VoiceOver hears the failure too.
+  useAnnounce(
+    failed
+      ? `${t(emergency ? 'speech.emergencyFallback' : 'speech.outputFailed')}. ${playback.text}`
+      : undefined,
+  );
 
   // Emergency keeps its red ground in both modes: the colour is the alarm,
   // and it should not change meaning depending on whether the audio worked.

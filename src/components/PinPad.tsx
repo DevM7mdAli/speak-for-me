@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -13,23 +13,31 @@ export const PIN_LENGTH = 4;
 interface PinPadProps {
   prompt: string;
   error?: string;
+  /** Blocks input while a lockout delay is running. */
+  disabled?: boolean;
   /** Called once PIN_LENGTH digits are entered; pad clears itself after. */
   onComplete: (pin: string) => void;
 }
 
 /** Large-key numeric pad; digits stay western in both languages. */
-export function PinPad({ prompt, error, onComplete }: PinPadProps) {
+export function PinPad({ prompt, error, disabled = false, onComplete }: PinPadProps) {
   const colors = useAppColors();
   const { t } = useTranslation();
   const [digits, setDigits] = useState('');
+  // The parent's check is async, so the pad clears before it resolves.
+  // Without this guard, digits typed during that window could submit twice.
+  const submitting = useRef(false);
 
   const pressDigit = (digit: string) => {
+    if (disabled || submitting.current) return;
     const next = digits + digit;
     setDigits(next);
     if (next.length === PIN_LENGTH) {
+      submitting.current = true;
       // Let the last dot render before the parent decides what happens next.
       setTimeout(() => {
         setDigits('');
+        submitting.current = false;
         onComplete(next);
       }, 120);
     }
@@ -66,7 +74,12 @@ export function PinPad({ prompt, error, onComplete }: PinPadProps) {
         {rows.map((row) => (
           <View key={row[0]} className="flex-row gap-3">
             {row.map((digit) => (
-              <BigButton key={digit} onPress={() => pressDigit(digit)} accessibilityLabel={digit}>
+              <BigButton
+                key={digit}
+                onPress={() => pressDigit(digit)}
+                accessibilityLabel={digit}
+                disabled={disabled}
+              >
                 <AppText size="xl" weight="medium">
                   {digit}
                 </AppText>
@@ -75,7 +88,7 @@ export function PinPad({ prompt, error, onComplete }: PinPadProps) {
           </View>
         ))}
         <View className="flex-row justify-center gap-3">
-          <BigButton onPress={() => pressDigit('0')} accessibilityLabel="0">
+          <BigButton onPress={() => pressDigit('0')} accessibilityLabel="0" disabled={disabled}>
             <AppText size="xl" weight="medium">
               0
             </AppText>
@@ -86,6 +99,7 @@ export function PinPad({ prompt, error, onComplete }: PinPadProps) {
               setDigits((d) => d.slice(0, -1));
             }}
             accessibilityLabel={t('pin.deleteDigit')}
+            disabled={disabled}
             haptic={false}
           >
             <MaterialCommunityIcons name="backspace-outline" size={32} color={colors.foreground} />

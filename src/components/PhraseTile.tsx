@@ -49,14 +49,14 @@ export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProp
         accessibilityState={{ busy: isSpeaking }}
         tone={isSpeaking ? 'primary' : 'default'}
         haptic={false}
-        className="min-h-[132px] border-accent/35 p-3"
+        className="min-h-36 border-accent/35 p-3"
       >
         {isSpeaking ? (
           <ActivityIndicator size="large" colorClassName="accent-on-primary" />
         ) : phrase.photoUri ? (
           <Image
             source={{ uri: phrase.photoUri }}
-            className="h-14 w-14 rounded-[10px]"
+            className="h-16 w-16 rounded-[8px]"
             resizeMode="cover"
             accessibilityLabel={t('a11y.photoOfPhrase')}
             accessibilityIgnoresInvertColors
@@ -74,9 +74,9 @@ export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProp
           size="md"
           weight="medium"
           tone={isSpeaking ? 'onPrimary' : 'default'}
-          className="mt-2 text-center"
+          className="mt-2 px-2 text-center"
         >
-          {isSpeaking ? t('speech.speaking') : text}
+          {text}
         </AppText>
       </BigButton>
 
@@ -90,7 +90,7 @@ export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProp
           accessibilityLabel={phrase.isFavorite ? t('myPhrases.unfavorite') : t('myPhrases.favorite')}
           accessibilityState={{ selected: phrase.isFavorite }}
           hitSlop={8}
-          className="absolute top-1 end-1 h-12 w-12 items-center justify-center rounded-[10px] active:border-2 active:border-border active:bg-surface-pressed"
+          className="absolute top-2 end-2 h-14 w-14 items-center justify-center rounded-[8px] border border-border bg-surface active:bg-surface-pressed"
         >
           <MaterialCommunityIcons
             name={phrase.isFavorite ? 'star' : 'star-outline'}

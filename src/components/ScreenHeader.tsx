@@ -15,8 +15,8 @@ interface ScreenHeaderProps {
 }
 
 /**
- * In-screen header with an oversized, labeled back button. Icon glyphs
- * don't mirror with the layout, so the arrow direction is set explicitly.
+ * In-screen header with a large, familiar back target. Icon glyphs don't
+ * mirror with the layout, so the arrow direction is set explicitly.
  */
 export function ScreenHeader({ title, right }: ScreenHeaderProps) {
   const router = useRouter();
@@ -24,22 +24,26 @@ export function ScreenHeader({ title, right }: ScreenHeaderProps) {
   const { t } = useTranslation();
 
   return (
-    <View className="flex-row items-center gap-3 px-4 py-2">
+    <View className="flex-row items-center gap-3 border-b border-border/60 px-4 py-2">
       <BigButton
         onPress={() => router.back()}
         accessibilityLabel={t('common.back')}
         minSize={64}
-        className="flex-row gap-1 px-4"
       >
         <MaterialCommunityIcons
           name={I18nManager.isRTL ? 'arrow-right' : 'arrow-left'}
           size={28}
           color={colors.foreground}
         />
-        <AppText weight="medium">{t('common.back')}</AppText>
       </BigButton>
 
-      <AppText size="lg" weight="bold" className="flex-1" numberOfLines={1} accessibilityRole="header">
+      <AppText
+        size="lg"
+        weight="bold"
+        className="flex-1"
+        numberOfLines={2}
+        accessibilityRole="header"
+      >
         {title}
       </AppText>
 

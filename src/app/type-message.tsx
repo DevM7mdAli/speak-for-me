@@ -32,6 +32,7 @@ export default function TypeMessageScreen() {
 
   const [text, setText] = useState('');
   const [suggestions, setSuggestions] = useState<Phrase[]>([]);
+  const stackToolbar = textScale >= 1.4;
   const isSpeaking = useSpeechStore(
     (state) =>
       state.playback.language === language &&
@@ -100,12 +101,14 @@ export default function TypeMessageScreen() {
         </ScrollView>
 
         {/* Speak stays visible above the keyboard at all times. */}
-        <View className="flex-row gap-3 border-t-2 border-border bg-background p-4 high-contrast:border-t-[3px]">
+        <View
+          className={`gap-3 border-t-2 border-border bg-background p-4 high-contrast:border-t-[3px] ${stackToolbar ? '' : 'flex-row'}`}
+        >
           <BigButton
             onPress={() => setText('')}
             accessibilityLabel={t('type.clear')}
             disabled={!text}
-            className="px-4"
+            className={stackToolbar ? 'w-full px-4' : 'px-4'}
           >
             <AppText weight="medium">{t('type.clear')}</AppText>
           </BigButton>
@@ -116,7 +119,7 @@ export default function TypeMessageScreen() {
             accessibilityState={{ busy: isSpeaking }}
             tone="primary"
             haptic={false}
-            className="flex-1 flex-row gap-3"
+            className={`${stackToolbar ? 'w-full' : 'flex-1'} flex-row gap-3`}
           >
             {isSpeaking ? (
               <ActivityIndicator colorClassName="accent-on-primary" />

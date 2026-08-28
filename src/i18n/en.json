@@ -4,8 +4,11 @@
   },
   "home": {
     "callNurse": "Call the nurse",
+    "breathingEmergency": "I can't breathe well",
     "typeMessage": "Type a message",
-    "myPhrases": "My phrases"
+    "myPhrases": "My phrases",
+    "savedPhrases": "Favorites and recent",
+    "customWords": "Custom words"
   },
   "common": {
     "back": "Back",
@@ -54,6 +57,9 @@
     "clear": "Clear",
     "speakWhatITyped": "Speak what I typed",
     "suggestions": "Suggestions"
+  },
+  "category": {
+    "empty": "No phrases here yet."
   },
   "myPhrases": {
     "title": "My phrases",
@@ -116,6 +122,7 @@
   "a11y": {
     "speaks": "Speaks: {{text}}",
     "emergencyButton": "Call the nurse. Emergency button. Speaks immediately.",
+    "breathingEmergencyButton": "I can't breathe well. Emergency button. Speaks immediately.",
     "openCategory": "Open category {{name}}",
     "openSettings": "Open caregiver settings",
     "languageToggle": "Switch language to Arabic",

@@ -4,8 +4,11 @@
   },
   "home": {
     "callNurse": "نادِ الممرضة",
+    "breathingEmergency": "لا أستطيع التنفس جيداً",
     "typeMessage": "اكتب رسالة",
-    "myPhrases": "عباراتي"
+    "myPhrases": "عباراتي",
+    "savedPhrases": "المفضلة والمستخدمة مؤخراً",
+    "customWords": "كلماتي الخاصة"
   },
   "common": {
     "back": "رجوع",
@@ -54,6 +57,9 @@
     "clear": "مسح",
     "speakWhatITyped": "انطق ما كتبته",
     "suggestions": "اقتراحات"
+  },
+  "category": {
+    "empty": "لا توجد عبارات هنا بعد."
   },
   "myPhrases": {
     "title": "عباراتي",
@@ -116,6 +122,7 @@
   "a11y": {
     "speaks": "ينطق: {{text}}",
     "emergencyButton": "نادِ الممرضة. زر الطوارئ. ينطق فوراً.",
+    "breathingEmergencyButton": "لا أستطيع التنفس جيداً. زر الطوارئ. ينطق فوراً.",
     "openCategory": "افتح فئة {{name}}",
     "openSettings": "افتح إعدادات مقدم الرعاية",
     "languageToggle": "غيّر اللغة إلى الإنجليزية",

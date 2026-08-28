@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { AppText } from '@/components/AppText';
 import { BigButton } from '@/components/BigButton';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { RestartOverlay } from '@/components/RestartOverlay';
+import { ManualRestartNotice, RestartOverlay } from '@/components/RestartOverlay';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SpeechHealthPanel } from '@/components/SpeechHealthPanel';
@@ -73,7 +73,8 @@ export default function SettingsScreen() {
   const settings = useSettings();
   const update = useSettingsStore((s) => s.update);
   const resetSettings = useSettingsStore((s) => s.reset);
-  const { restarting, switchLanguage } = useLanguageSwitch();
+  const { restarting, manualRestart, dismissManualRestart, switchLanguage } =
+    useLanguageSwitch();
   const { restartPinSetup } = useSettingsGate();
 
   const customPhrases = usePhraseStore(
@@ -166,6 +167,59 @@ export default function SettingsScreen() {
           </BigButton>
         </Section>
 
+        <Section title={t('speechLanguage.title')}>
+          <AppText size="sm" muted>
+            {t('speechLanguage.hint')}
+          </AppText>
+          <View className="gap-3">
+            <View className="flex-row gap-3">
+              <OptionButton
+                label={t('speechLanguage.follow')}
+                selected={settings.speechLanguage === 'follow'}
+                onPress={() => update({ speechLanguage: 'follow' })}
+              />
+              <OptionButton
+                label={t('speechLanguage.both')}
+                selected={settings.speechLanguage === 'both'}
+                onPress={() => update({ speechLanguage: 'both' })}
+              />
+            </View>
+            <View className="flex-row gap-3">
+              <OptionButton
+                label={t('speechLanguage.en')}
+                selected={settings.speechLanguage === 'en'}
+                onPress={() => update({ speechLanguage: 'en' })}
+              />
+              <OptionButton
+                label={t('speechLanguage.ar')}
+                selected={settings.speechLanguage === 'ar'}
+                onPress={() => update({ speechLanguage: 'ar' })}
+              />
+            </View>
+          </View>
+
+          {settings.speechLanguage === 'both' && (
+            <View className="gap-3">
+              <AppText size="sm" muted>
+                {t('speechLanguage.bothHint')}
+              </AppText>
+              <AppText weight="medium">{t('speechLanguage.leadTitle')}</AppText>
+              <View className="flex-row gap-3">
+                <OptionButton
+                  label={t('settings.english')}
+                  selected={settings.speechLanguageLead === 'en'}
+                  onPress={() => update({ speechLanguageLead: 'en' })}
+                />
+                <OptionButton
+                  label={t('settings.arabic')}
+                  selected={settings.speechLanguageLead === 'ar'}
+                  onPress={() => update({ speechLanguageLead: 'ar' })}
+                />
+              </View>
+            </View>
+          )}
+        </Section>
+
         <Section title={t('settings.speech')}>
           <View className="flex-row gap-3">
             {SPEECH_RATES.map((rate) => (
@@ -246,6 +300,7 @@ export default function SettingsScreen() {
         onCancel={() => setConfirmReset(false)}
       />
       <RestartOverlay visible={restarting} message={t('language.restarting')} />
+      <ManualRestartNotice visible={manualRestart} onDismiss={dismissManualRestart} />
     </Screen>
   );
 }

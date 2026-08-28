@@ -109,9 +109,12 @@ export class LocalPhraseRepository implements PhraseRepository {
   async searchPhrases(query: string, language: 'en' | 'ar', limit: number): Promise<Phrase[]> {
     const db = await this.db();
     const column = language === 'ar' ? 'text_ar' : 'text_en';
+    // % and _ are LIKE wildcards. A patient typing either means the
+    // character, not "match anything".
+    const escaped = query.replace(/[\\%_]/g, (char) => `\\${char}`);
     const rows = await db.getAllAsync<PhraseRow>(
-      `SELECT * FROM phrases WHERE ${column} LIKE ? COLLATE NOCASE ORDER BY last_used_at DESC, sort_order LIMIT ?`,
-      [`%${query}%`, limit],
+      `SELECT * FROM phrases WHERE ${column} LIKE ? ESCAPE '\\' COLLATE NOCASE ORDER BY last_used_at DESC, sort_order LIMIT ?`,
+      [`%${escaped}%`, limit],
     );
     return rows.map(toPhrase);
   }

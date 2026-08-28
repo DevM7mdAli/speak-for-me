@@ -6,8 +6,10 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/AppText';
 import { PhraseTile } from '@/components/PhraseTile';
+import { EmergencyStrip } from '@/components/EmergencyStrip';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { SpeechStatusBanner } from '@/components/SpeechStatusBanner';
 import { useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
 import { usePhraseStore } from '@/store/phraseStore';
@@ -42,6 +44,8 @@ export default function CategoryScreen() {
   return (
     <Screen>
       <ScreenHeader title={title} />
+      <EmergencyStrip />
+      <SpeechStatusBanner />
       <FlatList
         data={phrases ?? []}
         key={`category-${columnCount}`}

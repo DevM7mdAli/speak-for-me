@@ -7,6 +7,7 @@
     "@expo/ui": "~57.0.3",
     "@expo/vector-icons": "^15.0.2",
     "expo": "~57.0.2",
+    "expo-audio": "~57.0.4",
     "expo-constants": "~57.0.3",
     "expo-crypto": "~57.0.0",
     "expo-device": "~57.0.0",
@@ -16,6 +17,7 @@
     "expo-haptics": "~57.0.0",
     "expo-image": "~57.0.0",
     "expo-image-picker": "~57.0.2",
+    "expo-keep-awake": "~57.0.1",
     "expo-linking": "~57.0.1",
     "expo-localization": "~57.0.0",
     "expo-router": "~57.0.3",
@@ -43,8 +45,12 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@react-native/jest-preset": "^0.86.3",
+    "@types/jest": "29.5.14",
     "@types/react": "~19.2.2",
     "eas-cli": "^20.5.1",
+    "jest": "~29.7.0",
+    "jest-expo": "~57.0.5",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -52,8 +58,26 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "typecheck": "tsc --noEmit"
   },
   "private": true,
-  "packageManager": "pnpm@10.34.5"
+  "packageManager": "pnpm@10.34.5",
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!.*(react-native|@react-native|expo|@expo|@expo-google-fonts|uniwind|@testing-library))"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}"
+    ]
+  }
 }

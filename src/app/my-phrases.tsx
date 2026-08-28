@@ -6,8 +6,10 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/AppText';
 import { PhraseTile } from '@/components/PhraseTile';
+import { EmergencyStrip } from '@/components/EmergencyStrip';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { SpeechStatusBanner } from '@/components/SpeechStatusBanner';
 import type { Phrase } from '@/data/models';
 import { useSettings } from '@/hooks/useSettings';
 import { useSpeech } from '@/hooks/useSpeech';
@@ -65,6 +67,8 @@ export default function MyPhrasesScreen() {
   return (
     <Screen>
       <ScreenHeader title={t('myPhrases.title')} />
+      <EmergencyStrip />
+      <SpeechStatusBanner />
       <ScrollView contentContainerClassName="flex-grow gap-5 p-4 pb-8">
         {isEmpty && (
           <View className="flex-1 items-center justify-center gap-4 px-6 py-12">

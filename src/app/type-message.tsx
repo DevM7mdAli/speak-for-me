@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText, textSizeClass } from '@/components/AppText';
 import { BigButton } from '@/components/BigButton';
+import { EmergencyStrip } from '@/components/EmergencyStrip';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { Phrase } from '@/data/models';
@@ -59,6 +60,7 @@ export default function TypeMessageScreen() {
   return (
     <Screen>
       <ScreenHeader title={t('type.title')} />
+      <EmergencyStrip />
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

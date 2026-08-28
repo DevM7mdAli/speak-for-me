@@ -1,17 +1,22 @@
 import * as SQLite from 'expo-sqlite';
-import { randomUUID } from 'expo-crypto';
 
 import seed from './seed/phrases.en-ar.json';
+import { seedPhraseId } from './seedFallback';
 
 const DATABASE_NAME = 'speak-for-me.db';
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
 /** Single shared connection; migrated and seeded on first open. */
 export function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (!dbPromise) {
-    dbPromise = openAndMigrate();
+    dbPromise = openAndMigrate().catch((error) => {
+      // Never cache a rejected promise: doing so turns one transient
+      // failure into a permanently dead database for the whole process.
+      dbPromise = null;
+      throw error;
+    });
   }
   return dbPromise;
 }
@@ -60,11 +65,44 @@ async function openAndMigrate(): Promise<SQLite.SQLiteDatabase> {
         );
       `);
       await seedContent(tx);
-      await tx.execAsync(`PRAGMA user_version = ${SCHEMA_VERSION}`);
     });
   }
 
+  if (currentVersion < 2) {
+    // v1 gave built-in phrases a randomUUID() at insert time, so their ids
+    // differed on every install and could not survive a reseed. Re-key them
+    // to ids derived from their content, carrying the patient's favourites
+    // and usage history across by matching on the English text.
+    await db.withExclusiveTransactionAsync(async (tx) => {
+      await migrateSeedPhraseIds(tx);
+    });
+  }
+
+  await db.execAsync(`PRAGMA user_version = ${SCHEMA_VERSION}`);
   return db;
+}
+
+type Runner = Pick<SQLite.SQLiteDatabase, 'runAsync' | 'getAllAsync'>;
+
+async function migrateSeedPhraseIds(db: Runner): Promise<void> {
+  const existing = await db.getAllAsync<{
+    id: string;
+    text_en: string;
+    is_favorite: number;
+    last_used_at: string | null;
+  }>('SELECT id, text_en, is_favorite, last_used_at FROM phrases WHERE is_custom = 0');
+
+  for (const row of existing) {
+    const match = seed.phrases.find((phrase) => phrase.en === row.text_en);
+    if (!match) continue;
+
+    const stableId = seedPhraseId(match.category, match.en);
+    if (stableId === row.id) continue;
+
+    // Row already re-keyed by an earlier partial run: keep the newer one.
+    await db.runAsync('DELETE FROM phrases WHERE id = ?', [stableId]);
+    await db.runAsync('UPDATE phrases SET id = ? WHERE id = ?', [stableId, row.id]);
+  }
 }
 
 /** Insert built-in categories and phrases. Assumes empty tables. */
@@ -78,11 +116,27 @@ export async function seedContent(db: Pick<SQLite.SQLiteDatabase, 'runAsync'>): 
   }
 
   const now = new Date().toISOString();
-  for (const [index, phrase] of seed.phrases.entries()) {
+  // Ordered within each category. A single running index across the whole
+  // seed file disagreed with createPhrase(), which numbers per category.
+  const orderByCategory: Record<string, number> = {};
+
+  for (const phrase of seed.phrases) {
+    const sortOrder = orderByCategory[phrase.category] ?? 0;
+    orderByCategory[phrase.category] = sortOrder + 1;
+
     await db.runAsync(
       `INSERT INTO phrases (id, category_id, text_en, text_ar, icon_name, is_custom, is_favorite, sort_order, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?)`,
-      [randomUUID(), phrase.category, phrase.en, phrase.ar, phrase.iconName, index, now, now],
+      [
+        seedPhraseId(phrase.category, phrase.en),
+        phrase.category,
+        phrase.en,
+        phrase.ar,
+        phrase.iconName,
+        sortOrder,
+        now,
+        now,
+      ],
     );
   }
 }

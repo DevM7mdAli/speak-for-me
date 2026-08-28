@@ -2,26 +2,37 @@ import { View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
+import { resolveSpeechLanguages } from '@/i18n/speechLanguage';
 import { useSettings } from '@/hooks/useSettings';
 import { useSpeechStore } from '@/store/speechStore';
 import { useAppColors } from '@/theme/useAppColors';
 import { AppText } from './AppText';
 
-/** A persistent warning when the current language has not been verified for speech. */
+/**
+ * A persistent warning when a language the phone is set to speak has not
+ * been verified.
+ *
+ * Follows the speech languages rather than the display language: with the
+ * screen in Arabic and the output in English, warning about the Arabic
+ * voice would report on one the phone is no longer using.
+ */
 export function SpeechStatusBanner() {
   const { t } = useTranslation();
   const colors = useAppColors();
   const settings = useSettings();
-  const capability = useSpeechStore((state) => state.capabilities[settings.language]);
-  const confirmedAt = settings.speechCheckConfirmedAt[settings.language];
+  const capabilities = useSpeechStore((state) => state.capabilities);
 
-  if (capability.status === 'checking' || (capability.status === 'ready' && confirmedAt)) {
-    return null;
-  }
+  const languages = resolveSpeechLanguages(settings.language, settings);
+  const problem = languages.find((language) => {
+    const capability = capabilities[language];
+    if (capability.status === 'checking') return false;
+    return capability.status !== 'ready' || !settings.speechCheckConfirmedAt[language];
+  });
 
-  const languageName = t(
-    settings.language === 'en' ? 'settings.english' : 'settings.arabic',
-  );
+  if (!problem) return null;
+
+  const capability = capabilities[problem];
+  const languageName = t(problem === 'en' ? 'settings.english' : 'settings.arabic');
   const message =
     capability.status === 'unavailable'
       ? t('speech.statusUnavailable', { language: languageName })

@@ -34,10 +34,12 @@ export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProp
   const { language } = useSettings();
   const { t } = useTranslation();
   const text = phrase.text[language];
+  // Keyed on the phrase's identity rather than its text. Matching on text
+  // lit up every tile sharing a string, and dropped the indicator halfway
+  // through a phrase spoken in two languages.
   const isSpeaking = useSpeechStore(
     (state) =>
-      state.playback.language === language &&
-      state.playback.text === text &&
+      state.playback.phraseId === phrase.id &&
       (state.playback.status === 'starting' || state.playback.status === 'speaking'),
   );
 

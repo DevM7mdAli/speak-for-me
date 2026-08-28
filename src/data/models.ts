@@ -1,3 +1,5 @@
+import type { SpeechLanguageMode } from '@/i18n/speechLanguage';
+
 /** Text that must exist in every supported language — no partial content. */
 export interface LocalizedText {
   en: string;
@@ -35,7 +37,16 @@ export interface Category {
 }
 
 export interface AppSettings {
+  /** What the patient reads: UI chrome, tile text, and layout direction. */
   language: 'en' | 'ar';
+  /**
+   * What the room hears, which is a separate question. The patient may
+   * read Arabic while the nurse on shift reads only English, and `both`
+   * covers the case where nobody knows who will be at the bedside.
+   */
+  speechLanguage: SpeechLanguageMode;
+  /** Which language leads in `both` mode. Ignored otherwise. */
+  speechLanguageLead: 'en' | 'ar';
   /** 1.0 default, up to 1.6. */
   textScale: number;
   highContrast: boolean;
@@ -50,6 +61,10 @@ export interface AppSettings {
 
 export const DEFAULT_SETTINGS: AppSettings = {
   language: 'en',
+  // Defaults reproduce the previous behaviour exactly, so an install that
+  // predates these fields keeps working the way its caregiver expects.
+  speechLanguage: 'follow',
+  speechLanguageLead: 'en',
   textScale: 1.0,
   highContrast: false,
   preferredVoiceId: {},

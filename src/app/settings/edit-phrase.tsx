@@ -54,6 +54,7 @@ export default function EditPhraseScreen() {
   const [photoUri, setPhotoUri] = useState<string>();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -68,12 +69,17 @@ export default function EditPhraseScreen() {
   }, [id]);
 
   const pickPhoto = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.7,
-    });
-    if (!result.canceled) {
-      setPhotoUri(result.assets[0].uri);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.7,
+      });
+      if (!result.canceled) {
+        setPhotoUri(result.assets[0].uri);
+      }
+    } catch {
+      // Permission refused or the picker was unavailable. A phrase does
+      // not need a photo, so there is nothing to recover from.
     }
   };
 
@@ -81,27 +87,41 @@ export default function EditPhraseScreen() {
 
   const handleSave = async () => {
     setSaving(true);
-    // Photos are only copied into permanent storage on save, so a
-    // cancelled edit never leaves orphaned files behind.
-    let savedPhotoUri = photoUri;
-    if (photoUri && photoUri !== original?.photoUri) {
-      savedPhotoUri = persistPhoto(photoUri);
-    }
-    if (original?.photoUri && original.photoUri !== savedPhotoUri) {
-      deletePhotoQuietly(original.photoUri);
-    }
+    setSaveError(false);
+    try {
+      // Photos are only copied into permanent storage on save, so a
+      // cancelled edit never leaves orphaned files behind. The picker's
+      // cache can be evicted between choosing and saving, so this throws
+      // more often than it looks like it should.
+      let savedPhotoUri = photoUri;
+      if (photoUri && photoUri !== original?.photoUri) {
+        savedPhotoUri = persistPhoto(photoUri);
+      }
 
-    const input = {
-      categoryId: MY_WORDS_CATEGORY_ID,
-      text: { en: textEn.trim(), ar: textAr.trim() },
-      photoUri: savedPhotoUri,
-    };
-    if (original) {
-      await updatePhrase(original.id, input);
-    } else {
-      await createPhrase(input);
+      const input = {
+        categoryId: MY_WORDS_CATEGORY_ID,
+        text: { en: textEn.trim(), ar: textAr.trim() },
+        photoUri: savedPhotoUri,
+      };
+      if (original) {
+        await updatePhrase(original.id, input);
+      } else {
+        await createPhrase(input);
+      }
+
+      // Only once the row is safely written. Deleting first meant a failed
+      // write left a surviving row pointing at a file that no longer
+      // existed — a permanently broken tile.
+      if (original?.photoUri && original.photoUri !== savedPhotoUri) {
+        deletePhotoQuietly(original.photoUri);
+      }
+      router.back();
+    } catch {
+      // Keep the editor open with the text intact so the work is not lost.
+      setSaveError(true);
+    } finally {
+      setSaving(false);
     }
-    router.back();
   };
 
   const handleDelete = async () => {
@@ -180,6 +200,12 @@ export default function EditPhraseScreen() {
             </BigButton>
           )}
         </View>
+
+        {saveError && (
+          <AppText weight="medium" tone="danger" accessibilityLiveRegion="assertive">
+            {t('editPhrase.saveFailed')}
+          </AppText>
+        )}
 
         <BigButton
           onPress={handleSave}

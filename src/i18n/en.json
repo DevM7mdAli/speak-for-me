@@ -22,7 +22,9 @@
   "language": {
     "switchTo": "عربي",
     "restarting": "Restarting for Arabic layout…",
-    "toggleHint": "Switches the app language and layout direction"
+    "toggleHint": "Switches the app language and layout direction",
+    "manualRestartTitle": "Close and reopen the app",
+    "manualRestartBody": "The language was saved, but the screen layout only changes when the app starts fresh. Close it completely, then open it again."
   },
   "speech": {
     "checking": "Checking speech…",
@@ -117,7 +119,8 @@
     "deletePhrase": "Delete this phrase",
     "deleteConfirmTitle": "Delete this phrase?",
     "deleteConfirmBody": "The phrase will be removed from My words.",
-    "required": "Both languages are required so the phrase works after switching language."
+    "required": "Both languages are required so the phrase works after switching language.",
+    "saveFailed": "Could not save. Your text is still here — try again."
   },
   "a11y": {
     "speaks": "Speaks: {{text}}",
@@ -128,5 +131,19 @@
     "languageToggle": "Switch language to Arabic",
     "textInput": "Message to speak",
     "photoOfPhrase": "Photo for this phrase"
+  },
+  "errors": {
+    "criticalFallback": "Something went wrong. These still work.",
+    "retry": "Try again"
+  },
+  "speechLanguage": {
+    "title": "What the phone says out loud",
+    "follow": "Same as the screen",
+    "en": "Always English",
+    "ar": "Always Arabic",
+    "both": "Both languages",
+    "leadTitle": "Which language comes first",
+    "hint": "The screen stays in the patient’s language. This only changes what is spoken aloud.",
+    "bothHint": "Spoken twice, one language after the other. If one voice is missing, the other still speaks."
   }
 }

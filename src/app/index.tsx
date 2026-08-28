@@ -6,7 +6,9 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/AppText';
 import { BigButton } from '@/components/BigButton';
-import { RestartOverlay } from '@/components/RestartOverlay';
+import { ManualRestartNotice, RestartOverlay } from '@/components/RestartOverlay';
+import { EMERGENCY_CATEGORY_ID } from '@/components/EmergencyStrip';
+import { seedPhraseId } from '@/data/seedFallback';
 import { Screen } from '@/components/Screen';
 import { SpeechStatusBanner } from '@/components/SpeechStatusBanner';
 import { phraseIcon } from '@/components/PhraseTile';
@@ -15,8 +17,6 @@ import { useSpeech } from '@/hooks/useSpeech';
 import { usePhraseStore } from '@/store/phraseStore';
 import { useSpeechStore } from '@/store/speechStore';
 import { useAppColors } from '@/theme/useAppColors';
-
-const EMERGENCY_CATEGORY_ID = 'emergency';
 
 interface HomeTile {
   key: string;
@@ -32,7 +32,8 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const colors = useAppColors();
   const { language, textScale } = useSettings();
-  const { restarting, switchLanguage } = useLanguageSwitch();
+  const { restarting, manualRestart, dismissManualRestart, switchLanguage } =
+    useLanguageSwitch();
   const { speakPhrase, speakText } = useSpeech();
 
   const categories = usePhraseStore((s) => s.categories);
@@ -44,8 +45,17 @@ export default function HomeScreen() {
     loadCategory(EMERGENCY_CATEGORY_ID);
   }, [loadCategory]);
 
+  // Identified by content, not by position in the seed file. Sorting or
+  // adding an emergency phrase used to be able to make the lungs button
+  // say "Call the nurse".
+  const nurseCall = emergencyPhrases?.find(
+    (phrase) => phrase.id === seedPhraseId(EMERGENCY_CATEGORY_ID, 'Call the nurse'),
+  );
+  const breathingEmergency = emergencyPhrases?.find(
+    (phrase) => phrase.id === seedPhraseId(EMERGENCY_CATEGORY_ID, "I can't breathe well"),
+  );
+
   const speakCallNurse = () => {
-    const nurseCall = emergencyPhrases?.[0];
     if (nurseCall) {
       speakPhrase(nurseCall, { emergency: true });
     } else {
@@ -54,7 +64,6 @@ export default function HomeScreen() {
   };
 
   const speakBreathingEmergency = () => {
-    const breathingEmergency = emergencyPhrases?.[1];
     if (breathingEmergency) {
       speakPhrase(breathingEmergency, { emergency: true });
     } else {
@@ -63,12 +72,10 @@ export default function HomeScreen() {
   };
 
   const speechActive = playback.status === 'starting' || playback.status === 'speaking';
-  const nurseText = emergencyPhrases?.[0]?.text[language] ?? t('home.callNurse');
-  const breathingText =
-    emergencyPhrases?.[1]?.text[language] ?? t('home.breathingEmergency');
-  const nurseSpeaking = playback.emergency && speechActive && playback.text === nurseText;
+  const nurseSpeaking =
+    speechActive && !!nurseCall && playback.phraseId === nurseCall.id;
   const breathingSpeaking =
-    playback.emergency && speechActive && playback.text === breathingText;
+    speechActive && !!breathingEmergency && playback.phraseId === breathingEmergency.id;
   const columnCount = textScale >= 1.4 ? 1 : 2;
   const stackedHeader = textScale >= 1.4;
 
@@ -229,6 +236,7 @@ export default function HomeScreen() {
       />
 
       <RestartOverlay visible={restarting} message={t('language.restarting')} />
+      <ManualRestartNotice visible={manualRestart} onDismiss={dismissManualRestart} />
     </Screen>
   );
 }

@@ -28,9 +28,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome-v2.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": [],
       "package": "com.devm7mdali.speakforme"
     },
     "web": {
@@ -54,7 +52,8 @@
         {
           "photosPermission": "Allows a caregiver to attach a photo to a custom phrase card."
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import type { Category, Phrase, PhraseInput } from '@/data/models';
 import { phraseRepository } from '@/data/repositories';
+import { seedCategories, seedPhrasesByCategory } from '@/data/seedFallback';
 
 const RECENT_LIMIT = 8;
 
@@ -12,7 +13,11 @@ interface PhraseState {
   recentlyUsed: Phrase[];
   favorites: Phrase[];
 
+  /** True when the database failed and content is coming from the bundle. */
+  degraded: boolean;
   loadCategories: () => Promise<void>;
+  /** Populates the store from the bundled seed. Used when SQLite is unusable. */
+  loadFromSeed: () => void;
   loadCategory: (categoryId: string) => Promise<void>;
   loadMyPhrases: () => Promise<void>;
 
@@ -29,12 +34,26 @@ export const usePhraseStore = create<PhraseState>((set, get) => ({
   phrasesByCategory: {},
   recentlyUsed: [],
   favorites: [],
+  degraded: false,
 
   loadCategories: async () => {
     set({ categories: await phraseRepository.getCategories() });
   },
 
+  loadFromSeed: () => {
+    set({
+      categories: seedCategories(),
+      phrasesByCategory: seedPhrasesByCategory(),
+      recentlyUsed: [],
+      favorites: [],
+      degraded: true,
+    });
+  },
+
   loadCategory: async (categoryId) => {
+    // In degraded mode the bundle is already the source of truth; going
+    // back to a database we know is broken would only blank the screen.
+    if (get().degraded) return;
     const phrases = await phraseRepository.getPhrases(categoryId);
     set((state) => ({
       phrasesByCategory: { ...state.phrasesByCategory, [categoryId]: phrases },

@@ -9,6 +9,7 @@ import { BigButton } from '@/components/BigButton';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { ManualRestartNotice, RestartOverlay } from '@/components/RestartOverlay';
 import { Screen } from '@/components/Screen';
+import { ReadinessPanel } from '@/components/ReadinessPanel';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SpeechHealthPanel } from '@/components/SpeechHealthPanel';
 import { usePhraseBackup } from '@/hooks/usePhraseBackup';
@@ -134,6 +135,10 @@ export default function SettingsScreen() {
     <Screen>
       <ScreenHeader title={t('settings.title')} />
       <ScrollView contentContainerClassName="gap-6 p-4">
+        <Section title={t('readiness.title')}>
+          <ReadinessPanel />
+        </Section>
+
         <Section title={t('settings.language')}>
           <View className="flex-row gap-3">
             <OptionButton

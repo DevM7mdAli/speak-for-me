@@ -178,5 +178,18 @@
     "exported": "Phrases exported.",
     "imported": "Imported {{count}} phrases.",
     "failed": "That did not work. Check the file and try again."
+  },
+  "readiness": {
+    "title": "Ready for the bedside",
+    "ready": "This device is ready for a patient",
+    "notReady": "Not ready yet",
+    "pin": "Caregiver PIN set",
+    "voice": "{{language}} voice installed",
+    "heard": "{{language}} sound confirmed by a caregiver",
+    "manualTitle": "Check these yourself — the app cannot see them:",
+    "manualCharger": "Plugged in, or a charger at the bedside",
+    "manualSilent": "Ringer not on silent, volume up",
+    "manualReach": "Phone within the patient’s reach and angle of view",
+    "manualBoard": "A printed communication board available as a backup"
   }
 }

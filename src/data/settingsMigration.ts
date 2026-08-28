@@ -37,6 +37,7 @@ export function migrateSettings(stored: unknown): AppSettings {
       ['follow', 'en', 'ar', 'both'].includes(v as string),
     ),
     speechLanguageLead: pick('speechLanguageLead', (v) => v === 'en' || v === 'ar'),
+    arabicForm: pick('arabicForm', (v) => v === 'masculine' || v === 'feminine'),
     preferredVoiceId:
       typeof raw.preferredVoiceId === 'object' && raw.preferredVoiceId !== null
         ? (raw.preferredVoiceId as AppSettings['preferredVoiceId'])

@@ -11,6 +11,7 @@ import { ManualRestartNotice, RestartOverlay } from '@/components/RestartOverlay
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SpeechHealthPanel } from '@/components/SpeechHealthPanel';
+import { usePhraseBackup } from '@/hooks/usePhraseBackup';
 import { useLanguageSwitch, useSettings } from '@/hooks/useSettings';
 import type { Phrase } from '@/data/models';
 import { usePhraseStore } from '@/store/phraseStore';
@@ -85,6 +86,21 @@ export default function SettingsScreen() {
   const clearPatientContent = usePhraseStore((s) => s.clearPatientContent);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmNewPatient, setConfirmNewPatient] = useState(false);
+  const {
+    busy: backupBusy,
+    result: backupResult,
+    exportPhrases,
+    importFromFile,
+  } = usePhraseBackup();
+
+  const backupMessage =
+    backupResult.kind === 'exported'
+      ? t('backup.exported')
+      : backupResult.kind === 'imported'
+        ? t('backup.imported', { count: backupResult.count })
+        : backupResult.kind === 'failed'
+          ? t('backup.failed')
+          : undefined;
 
   useFocusEffect(
     useCallback(() => {
@@ -234,6 +250,28 @@ export default function SettingsScreen() {
           )}
         </Section>
 
+        {(settings.language === 'ar' ||
+          settings.speechLanguage === 'ar' ||
+          settings.speechLanguage === 'both') && (
+          <Section title={t('arabicForm.title')}>
+            <AppText size="sm" muted>
+              {t('arabicForm.hint')}
+            </AppText>
+            <View className="flex-row gap-3">
+              <OptionButton
+                label={t('arabicForm.masculine')}
+                selected={settings.arabicForm === 'masculine'}
+                onPress={() => update({ arabicForm: 'masculine' })}
+              />
+              <OptionButton
+                label={t('arabicForm.feminine')}
+                selected={settings.arabicForm === 'feminine'}
+                onPress={() => update({ arabicForm: 'feminine' })}
+              />
+            </View>
+          </Section>
+        )}
+
         <Section title={t('settings.speech')}>
           <View className="flex-row gap-3">
             {SPEECH_RATES.map((rate) => (
@@ -278,6 +316,46 @@ export default function SettingsScreen() {
               <MaterialCommunityIcons name="pencil" size={26} color={colors.muted} />
             </BigButton>
           ))}
+        </Section>
+
+        <Section title={t('backup.title')}>
+          <AppText size="sm" muted>
+            {t('backup.hint')}
+          </AppText>
+          <View className="flex-row gap-3">
+            <BigButton
+              onPress={() => void exportPhrases()}
+              accessibilityLabel={t('backup.export')}
+              disabled={backupBusy}
+              minSize={64}
+              className="flex-1 px-3"
+            >
+              <AppText weight="medium" numberOfLines={1}>
+                {t('backup.export')}
+              </AppText>
+            </BigButton>
+            <BigButton
+              onPress={() => void importFromFile()}
+              accessibilityLabel={t('backup.import')}
+              disabled={backupBusy}
+              minSize={64}
+              className="flex-1 px-3"
+            >
+              <AppText weight="medium" numberOfLines={1}>
+                {t('backup.import')}
+              </AppText>
+            </BigButton>
+          </View>
+          {backupMessage && (
+            <AppText
+              size="sm"
+              weight="medium"
+              tone={backupResult.kind === 'failed' ? 'danger' : 'success'}
+              accessibilityLiveRegion="polite"
+            >
+              {backupMessage}
+            </AppText>
+          )}
         </Section>
 
         <Section title={t('settings.handover')}>

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import type { AppLanguage } from '@/i18n';
+import { phraseTextFor } from '@/i18n/arabicForm';
 import { detectScriptLanguage, resolveSpeechLanguages } from '@/i18n/speechLanguage';
 import type { Phrase } from '@/data/models';
 import { usePhraseStore } from '@/store/phraseStore';
@@ -39,7 +40,10 @@ export function useSpeech() {
     (phrase: Phrase, options?: SpeechRequestOptions) => {
       const languages = resolveSpeechLanguages(settings.language, settings);
       const parts = languages
-        .map((language) => ({ text: phrase.text[language], language }))
+        .map((language) => ({
+          text: phraseTextFor(phrase, language, settings.arabicForm),
+          language,
+        }))
         .filter((part) => part.text?.trim());
 
       const result = speak(parts, { ...options, phraseId: phrase.id });

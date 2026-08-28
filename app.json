@@ -53,7 +53,8 @@
           "photosPermission": "Allows a caregiver to attach a photo to a custom phrase card."
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,

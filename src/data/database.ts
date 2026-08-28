@@ -4,7 +4,7 @@ import seed from './seed/phrases.en-ar.json';
 import { seedPhraseId } from './seedFallback';
 
 const DATABASE_NAME = 'speak-for-me.db';
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
@@ -45,6 +45,7 @@ async function openAndMigrate(): Promise<SQLite.SQLiteDatabase> {
           category_id TEXT NOT NULL REFERENCES categories(id),
           text_en TEXT NOT NULL,
           text_ar TEXT NOT NULL,
+          text_ar_f TEXT,
           icon_name TEXT,
           photo_uri TEXT,
           is_custom INTEGER NOT NULL DEFAULT 0,
@@ -75,6 +76,29 @@ async function openAndMigrate(): Promise<SQLite.SQLiteDatabase> {
     // and usage history across by matching on the English text.
     await db.withExclusiveTransactionAsync(async (tx) => {
       await migrateSeedPhraseIds(tx);
+    });
+  }
+
+  // Only for databases that already exist: a fresh one was just created at
+  // the current schema by the block above.
+  if (currentVersion >= 1 && currentVersion < 3) {
+    // Arabic adjectives agree with the speaker, so phrases that change
+    // with the patient's grammatical gender gain a second Arabic string.
+    await db.withExclusiveTransactionAsync(async (tx) => {
+      const columns = await tx.getAllAsync<{ name: string }>(
+        "SELECT name FROM pragma_table_info('phrases')",
+      );
+      if (!columns.some((column) => column.name === 'text_ar_f')) {
+        await tx.execAsync('ALTER TABLE phrases ADD COLUMN text_ar_f TEXT');
+      }
+
+      // Built-in phrases are replaced from the bundle so the new variants
+      // and the expanded clinical set land. Custom phrases are untouched,
+      // and categories are upserted rather than deleted — custom phrases
+      // hold a foreign key into `my-words`, so clearing the table would
+      // fail with foreign keys on.
+      await tx.runAsync('DELETE FROM phrases WHERE is_custom = 0');
+      await seedContent(tx);
     });
   }
 
@@ -109,7 +133,7 @@ async function migrateSeedPhraseIds(db: Runner): Promise<void> {
 export async function seedContent(db: Pick<SQLite.SQLiteDatabase, 'runAsync'>): Promise<void> {
   for (const category of seed.categories) {
     await db.runAsync(
-      `INSERT INTO categories (id, label_en, label_ar, icon_name, sort_order, is_emergency)
+      `INSERT OR REPLACE INTO categories (id, label_en, label_ar, icon_name, sort_order, is_emergency)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [category.id, category.en, category.ar, category.iconName, category.sortOrder, category.isEmergency ? 1 : 0],
     );
@@ -125,13 +149,14 @@ export async function seedContent(db: Pick<SQLite.SQLiteDatabase, 'runAsync'>): 
     orderByCategory[phrase.category] = sortOrder + 1;
 
     await db.runAsync(
-      `INSERT INTO phrases (id, category_id, text_en, text_ar, icon_name, is_custom, is_favorite, sort_order, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?)`,
+      `INSERT OR REPLACE INTO phrases (id, category_id, text_en, text_ar, text_ar_f, icon_name, is_custom, is_favorite, sort_order, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?)`,
       [
         seedPhraseId(phrase.category, phrase.en),
         phrase.category,
         phrase.en,
         phrase.ar,
+        ('arFeminine' in phrase ? phrase.arFeminine : null) ?? null,
         phrase.iconName,
         sortOrder,
         now,

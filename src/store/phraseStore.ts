@@ -27,6 +27,8 @@ interface PhraseState {
   updatePhrase: (id: string, input: PhraseInput) => Promise<void>;
   deletePhrase: (phrase: Phrase) => Promise<void>;
   clearPatientContent: () => Promise<void>;
+  /** Adds imported phrases; never removes what is already there. */
+  importPhrases: (inputs: PhraseInput[]) => Promise<number>;
   resetToSeed: () => Promise<void>;
 }
 
@@ -92,6 +94,21 @@ export const usePhraseStore = create<PhraseState>((set, get) => ({
   deletePhrase: async (phrase) => {
     await phraseRepository.deletePhrase(phrase.id);
     await Promise.all([get().loadCategory(phrase.categoryId), get().loadMyPhrases()]);
+  },
+
+  importPhrases: async (inputs) => {
+    let imported = 0;
+    for (const input of inputs) {
+      // One failure must not abandon the rest of the file.
+      try {
+        await phraseRepository.createPhrase(input);
+        imported += 1;
+      } catch {
+        continue;
+      }
+    }
+    await get().loadCategory('my-words');
+    return imported;
   },
 
   clearPatientContent: async () => {

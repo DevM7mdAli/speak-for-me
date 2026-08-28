@@ -1,3 +1,4 @@
+import type { ArabicForm } from '@/i18n/arabicForm';
 import type { SpeechLanguageMode } from '@/i18n/speechLanguage';
 
 export type AppTheme = 'light' | 'dark' | 'high-contrast';
@@ -6,6 +7,12 @@ export type AppTheme = 'light' | 'dark' | 'high-contrast';
 export interface LocalizedText {
   en: string;
   ar: string;
+  /**
+   * Only on phrases whose Arabic changes with the speaker's gender.
+   * First-person present verbs (أحتاج, أشعر) are the same for everyone
+   * and carry no variant.
+   */
+  arFeminine?: string;
 }
 
 export type SyncStatus = 'local' | 'synced' | 'pending';
@@ -49,6 +56,11 @@ export interface AppSettings {
   speechLanguage: SpeechLanguageMode;
   /** Which language leads in `both` mode. Ignored otherwise. */
   speechLanguageLead: 'en' | 'ar';
+  /**
+   * Grammatical form, not identity: Arabic adjectives agree with the
+   * speaker, so "I am tired" is متعب or متعبة depending on who says it.
+   */
+  arabicForm: ArabicForm;
   /** 1.0 default, up to 1.6. */
   textScale: number;
   /**
@@ -71,6 +83,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   // predates these fields keeps working the way its caregiver expects.
   speechLanguage: 'follow',
   speechLanguageLead: 'en',
+  arabicForm: 'masculine',
   textScale: 1.0,
   theme: 'light',
   preferredVoiceId: {},

@@ -24,6 +24,11 @@ export function seedPhraseId(categoryId: string, textEn: string): string {
   return `seed:${categoryId}:${slug}`;
 }
 
+/** Not every seed row has the optional feminine variant. */
+function phraseArFeminine(phrase: { arFeminine?: string }): string | undefined {
+  return phrase.arFeminine;
+}
+
 export function seedCategories(): Category[] {
   return seed.categories
     .map((category) => ({
@@ -45,7 +50,7 @@ export function seedPhrasesByCategory(): Record<string, Phrase[]> {
     list.push({
       id: seedPhraseId(phrase.category, phrase.en),
       categoryId: phrase.category,
-      text: { en: phrase.en, ar: phrase.ar },
+      text: { en: phrase.en, ar: phrase.ar, arFeminine: phraseArFeminine(phrase) },
       iconName: phrase.iconName,
       isCustom: false,
       isFavorite: false,

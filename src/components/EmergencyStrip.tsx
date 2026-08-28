@@ -3,7 +3,7 @@ import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-import { useSettings } from '@/hooks/useSettings';
+import { usePhraseText } from '@/hooks/usePhraseText';
 import { useSpeech } from '@/hooks/useSpeech';
 import { usePhraseStore } from '@/store/phraseStore';
 import { useSpeechStore } from '@/store/speechStore';
@@ -25,8 +25,8 @@ export const EMERGENCY_CATEGORY_ID = 'emergency';
 export function EmergencyStrip() {
   const { t } = useTranslation();
   const colors = useAppColors();
-  const { language } = useSettings();
   const { speakPhrase, speakText } = useSpeech();
+  const phraseText = usePhraseText();
 
   const phrases = usePhraseStore((s) => s.phrasesByCategory[EMERGENCY_CATEGORY_ID]);
   const loadCategory = usePhraseStore((s) => s.loadCategory);
@@ -47,7 +47,7 @@ export function EmergencyStrip() {
     return (
       <View className="border-b-2 border-danger/40 px-4 py-2">
         <BigButton
-          onPress={() => speakText(t('home.callNurse'), language, { emergency: true })}
+          onPress={() => speakText(t('home.callNurse'), undefined, { emergency: true })}
           accessibilityLabel={t('a11y.emergencyButton')}
           tone="danger"
           haptic={false}
@@ -71,7 +71,7 @@ export function EmergencyStrip() {
         keyboardShouldPersistTaps="handled"
       >
         {phrases.map((phrase) => {
-          const text = phrase.text[language];
+          const text = phraseText(phrase);
           const busy = speechActive && playback.phraseId === phrase.id;
           return (
             <BigButton

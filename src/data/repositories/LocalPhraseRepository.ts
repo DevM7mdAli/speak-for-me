@@ -10,6 +10,7 @@ interface PhraseRow {
   category_id: string;
   text_en: string;
   text_ar: string;
+  text_ar_f: string | null;
   icon_name: string | null;
   photo_uri: string | null;
   is_custom: number;
@@ -34,7 +35,11 @@ function toPhrase(row: PhraseRow): Phrase {
   return {
     id: row.id,
     categoryId: row.category_id,
-    text: { en: row.text_en, ar: row.text_ar },
+    text: {
+      en: row.text_en,
+      ar: row.text_ar,
+      arFeminine: row.text_ar_f ?? undefined,
+    },
     iconName: row.icon_name ?? undefined,
     photoUri: row.photo_uri ?? undefined,
     isCustom: row.is_custom === 1,
@@ -157,13 +162,14 @@ export class LocalPhraseRepository implements PhraseRepository {
       syncStatus: 'local',
     };
     await db.runAsync(
-      `INSERT INTO phrases (id, category_id, text_en, text_ar, icon_name, photo_uri, is_custom, is_favorite, sort_order, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, 1, 0, ?, ?, ?)`,
+      `INSERT INTO phrases (id, category_id, text_en, text_ar, text_ar_f, icon_name, photo_uri, is_custom, is_favorite, sort_order, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0, ?, ?, ?)`,
       [
         phrase.id,
         phrase.categoryId,
         phrase.text.en,
         phrase.text.ar,
+        phrase.text.arFeminine ?? null,
         phrase.iconName ?? null,
         phrase.photoUri ?? null,
         phrase.sortOrder,
@@ -178,12 +184,13 @@ export class LocalPhraseRepository implements PhraseRepository {
     const db = await this.db();
     await db.runAsync(
       `UPDATE phrases
-       SET category_id = ?, text_en = ?, text_ar = ?, icon_name = ?, photo_uri = ?, updated_at = ?
+       SET category_id = ?, text_en = ?, text_ar = ?, text_ar_f = ?, icon_name = ?, photo_uri = ?, updated_at = ?
        WHERE id = ?`,
       [
         input.categoryId,
         input.text.en,
         input.text.ar,
+        input.text.arFeminine ?? null,
         input.iconName ?? null,
         input.photoUri ?? null,
         new Date().toISOString(),

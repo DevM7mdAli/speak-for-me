@@ -163,5 +163,20 @@
     "leadTitle": "Which language comes first",
     "hint": "The screen stays in the patient’s language. This only changes what is spoken aloud.",
     "bothHint": "Spoken twice, one language after the other. If one voice is missing, the other still speaks."
+  },
+  "arabicForm": {
+    "title": "Arabic wording",
+    "hint": "Arabic changes with who is speaking: “I am tired” is متعب or متعبة. Set the form the patient uses about themselves.",
+    "masculine": "متعب (male)",
+    "feminine": "متعبة (female)"
+  },
+  "backup": {
+    "title": "Backup",
+    "hint": "Custom phrases live only on this phone. Export them somewhere safe — a lost or wiped device loses the patient’s own words.",
+    "export": "Export phrases",
+    "import": "Import phrases",
+    "exported": "Phrases exported.",
+    "imported": "Imported {{count}} phrases.",
+    "failed": "That did not work. Check the file and try again."
   }
 }

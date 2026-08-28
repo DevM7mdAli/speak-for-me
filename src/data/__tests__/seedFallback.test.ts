@@ -42,4 +42,30 @@ describe('in-memory seed fallback', () => {
       expect(known).toContain(categoryId);
     }
   });
+
+
+  it('only stores a feminine variant where it differs from the masculine', () => {
+    for (const phrase of Object.values(seedPhrasesByCategory()).flat()) {
+      if (phrase.text.arFeminine) {
+        expect(phrase.text.arFeminine).not.toBe(phrase.text.ar);
+      }
+    }
+  });
+
+  it('keeps the airway phrases a ventilated patient needs', () => {
+    const english = Object.values(seedPhrasesByCategory())
+      .flat()
+      .map((p) => p.text.en.toLowerCase());
+
+    for (const needed of ['i need suction', 'i need to cough', 'the tube hurts']) {
+      expect(english).toContain(needed);
+    }
+  });
+
+  it('offers a way to say where the pain is', () => {
+    const locations = (seedPhrasesByCategory()['pain-body'] ?? []).filter((p) =>
+      p.text.en.toLowerCase().startsWith('the pain is in'),
+    );
+    expect(locations.length).toBeGreaterThanOrEqual(3);
+  });
 });

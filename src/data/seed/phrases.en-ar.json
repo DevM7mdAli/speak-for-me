@@ -1,30 +1,69 @@
 {
+  "_note": "DRAFT clinical content. The phrase set and its Arabic wording need sign-off from a nurse or SLP and a native Arabic speaker before bedside use. See _reviewNotes.",
+  "_reviewNotes": [
+    "Call the nurse: was 'نادِ الممرضة', which used a masculine imperative to a female nurse. Rephrased to 'أحتاج الممرض' — no imperative, generic masculine noun (standard MSA for an unspecified person). Needs a native check.",
+    "Change my position: was 'غيّر وضعيتي', a masculine imperative addressed to the caregiver. Rephrased to 'أحتاج تغيير وضعيتي'.",
+    "arFeminine is set only where the Arabic actually changes with the speaker's gender. First-person present verbs (أحتاج, أشعر, أريد) are the same for everyone and carry no variant.",
+    "Pain locations are a first pass, not a validated body map. Intensity is deliberately absent — a 0-10 scale needs its own screen, not a phrase tile."
+  ],
   "categories": [
     { "id": "emergency", "en": "Emergency", "ar": "طوارئ", "iconName": "bell-alert", "sortOrder": 0, "isEmergency": true },
-    { "id": "basic-needs", "en": "Basic needs", "ar": "احتياجات أساسية", "iconName": "hand-heart", "sortOrder": 1 },
+    { "id": "airway", "en": "Breathing & tube", "ar": "التنفس والأنبوب", "iconName": "lungs", "sortOrder": 1 },
     { "id": "pain-body", "en": "Pain & body", "ar": "الألم والجسم", "iconName": "human", "sortOrder": 2 },
-    { "id": "emotions", "en": "Emotions", "ar": "مشاعر", "iconName": "emoticon-happy-outline", "sortOrder": 3 },
-    { "id": "questions", "en": "Questions", "ar": "أسئلة", "iconName": "help-circle-outline", "sortOrder": 4 },
-    { "id": "my-words", "en": "My words", "ar": "كلماتي", "iconName": "star-outline", "sortOrder": 5 }
+    { "id": "basic-needs", "en": "Basic needs", "ar": "احتياجات أساسية", "iconName": "hand-heart", "sortOrder": 3 },
+    { "id": "questions", "en": "Answers & questions", "ar": "إجابات وأسئلة", "iconName": "help-circle-outline", "sortOrder": 4 },
+    { "id": "emotions", "en": "Feelings", "ar": "مشاعر", "iconName": "emoticon-happy-outline", "sortOrder": 5 },
+    { "id": "people", "en": "People", "ar": "أشخاص", "iconName": "account-group", "sortOrder": 6 },
+    { "id": "my-words", "en": "My words", "ar": "كلماتي", "iconName": "star-outline", "sortOrder": 7 }
   ],
   "phrases": [
-    { "en": "Call the nurse", "ar": "نادِ الممرضة", "category": "emergency", "iconName": "bell-alert" },
+    { "en": "Call the nurse", "ar": "أحتاج الممرض", "category": "emergency", "iconName": "bell-alert" },
     { "en": "I can't breathe well", "ar": "لا أستطيع التنفس جيداً", "category": "emergency", "iconName": "lungs" },
-    { "en": "I need water", "ar": "أحتاج ماء", "category": "basic-needs", "iconName": "cup-water" },
-    { "en": "I need the bathroom", "ar": "أحتاج الحمام", "category": "basic-needs", "iconName": "toilet" },
-    { "en": "I'm tired", "ar": "أنا متعب", "category": "basic-needs", "iconName": "bed" },
-    { "en": "Please turn me / change my position", "ar": "غيّر وضعيتي من فضلك", "category": "basic-needs", "iconName": "rotate-right" },
-    { "en": "I want to sleep", "ar": "أريد أن أنام", "category": "basic-needs", "iconName": "sleep" },
+    { "en": "I need suction", "ar": "أحتاج شفط الإفرازات", "category": "emergency", "iconName": "medical-bag" },
+
+    { "en": "I need to cough", "ar": "أحتاج أن أسعل", "category": "airway", "iconName": "account-voice" },
+    { "en": "The tube hurts", "ar": "الأنبوب يؤلمني", "category": "airway", "iconName": "bandage" },
+    { "en": "Too much air", "ar": "الهواء كثير", "category": "airway", "iconName": "weather-windy" },
+    { "en": "Not enough air", "ar": "الهواء غير كافٍ", "category": "airway", "iconName": "arrow-down-bold" },
+    { "en": "My mouth is dry", "ar": "فمي جاف", "category": "airway", "iconName": "water-off" },
+    { "en": "I need lip balm", "ar": "أحتاج مرطب الشفاه", "category": "airway", "iconName": "hand-heart" },
+
     { "en": "I'm in pain", "ar": "أشعر بألم", "category": "pain-body", "iconName": "lightning-bolt" },
+    { "en": "The pain is in my head", "ar": "الألم في رأسي", "category": "pain-body", "iconName": "head-outline" },
+    { "en": "The pain is in my chest", "ar": "الألم في صدري", "category": "pain-body", "iconName": "heart-pulse" },
+    { "en": "The pain is in my stomach", "ar": "الألم في بطني", "category": "pain-body", "iconName": "stomach" },
+    { "en": "The pain is in my arm or leg", "ar": "الألم في ذراعي أو ساقي", "category": "pain-body", "iconName": "arm-flex" },
+    { "en": "The pain is getting worse", "ar": "الألم يزداد", "category": "pain-body", "iconName": "trending-up" },
+    { "en": "I need pain medicine", "ar": "أحتاج مسكناً للألم", "category": "pain-body", "iconName": "pill" },
+    { "en": "I feel sick", "ar": "أشعر بالغثيان", "category": "pain-body", "iconName": "emoticon-sick-outline" },
+    { "en": "I feel itchy", "ar": "أشعر بحكة", "category": "pain-body", "iconName": "hand-back-right" },
     { "en": "I'm cold", "ar": "أشعر بالبرد", "category": "pain-body", "iconName": "snowflake" },
     { "en": "I'm hot", "ar": "أشعر بالحر", "category": "pain-body", "iconName": "weather-sunny" },
-    { "en": "I want to see my family", "ar": "أريد رؤية عائلتي", "category": "emotions", "iconName": "account-group" },
-    { "en": "I'm scared", "ar": "أشعر بالخوف", "category": "emotions", "iconName": "emoticon-cry-outline" },
-    { "en": "I'm anxious", "ar": "أشعر بالقلق", "category": "emotions", "iconName": "emoticon-confused-outline" },
-    { "en": "Thank you", "ar": "شكراً", "category": "emotions", "iconName": "hand-heart" },
+
+    { "en": "I need water", "ar": "أحتاج ماء", "category": "basic-needs", "iconName": "cup-water" },
+    { "en": "I need the bathroom", "ar": "أحتاج الحمام", "category": "basic-needs", "iconName": "toilet" },
+    { "en": "I need to change position", "ar": "أحتاج تغيير وضعيتي", "category": "basic-needs", "iconName": "rotate-right" },
+    { "en": "I'm tired", "ar": "أنا متعب", "arFeminine": "أنا متعبة", "category": "basic-needs", "iconName": "bed" },
+    { "en": "I want to sleep", "ar": "أريد أن أنام", "category": "basic-needs", "iconName": "sleep" },
+    { "en": "Too much light", "ar": "الضوء قوي", "category": "basic-needs", "iconName": "lightbulb-off-outline" },
+    { "en": "Too much noise", "ar": "الصوت مرتفع", "category": "basic-needs", "iconName": "volume-off" },
+
+    { "en": "Yes", "ar": "نعم", "category": "questions", "iconName": "check-bold" },
+    { "en": "No", "ar": "لا", "category": "questions", "iconName": "close-thick" },
+    { "en": "I don't know", "ar": "لا أعرف", "category": "questions", "iconName": "help-circle-outline" },
+    { "en": "Please wait", "ar": "انتظروا من فضلكم", "category": "questions", "iconName": "timer-sand" },
     { "en": "Where am I?", "ar": "أين أنا؟", "category": "questions", "iconName": "map-marker-question" },
     { "en": "What day is it?", "ar": "ما هو اليوم؟", "category": "questions", "iconName": "calendar-question" },
-    { "en": "Yes", "ar": "نعم", "category": "questions", "iconName": "check-bold" },
-    { "en": "No", "ar": "لا", "category": "questions", "iconName": "close-thick" }
+    { "en": "How long have I been here?", "ar": "منذ متى وأنا هنا؟", "category": "questions", "iconName": "clock-outline" },
+
+    { "en": "I'm scared", "ar": "أشعر بالخوف", "category": "emotions", "iconName": "emoticon-cry-outline" },
+    { "en": "I'm anxious", "ar": "أشعر بالقلق", "category": "emotions", "iconName": "emoticon-confused-outline" },
+    { "en": "I'm comfortable", "ar": "أنا مرتاح", "arFeminine": "أنا مرتاحة", "category": "emotions", "iconName": "emoticon-happy-outline" },
+    { "en": "Thank you", "ar": "شكراً", "category": "emotions", "iconName": "hand-heart" },
+
+    { "en": "I want to see my family", "ar": "أريد رؤية عائلتي", "category": "people", "iconName": "account-group" },
+    { "en": "Please call my family", "ar": "اتصلوا بعائلتي من فضلكم", "category": "people", "iconName": "phone" },
+    { "en": "I want the doctor", "ar": "أريد الطبيب", "category": "people", "iconName": "doctor" },
+    { "en": "I want to pray", "ar": "أريد أن أصلي", "category": "people", "iconName": "hands-pray" }
   ]
 }

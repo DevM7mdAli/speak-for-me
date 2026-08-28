@@ -4,7 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import type { Phrase } from '@/data/models';
-import { useSettings } from '@/hooks/useSettings';
+import { usePhraseText } from '@/hooks/usePhraseText';
 import { useSpeechStore } from '@/store/speechStore';
 import { useAppColors } from '@/theme/useAppColors';
 import { AppText } from './AppText';
@@ -31,9 +31,9 @@ interface PhraseTileProps {
  */
 export function PhraseTile({ phrase, onSpeak, onToggleFavorite }: PhraseTileProps) {
   const colors = useAppColors();
-  const { language } = useSettings();
   const { t } = useTranslation();
-  const text = phrase.text[language];
+  const phraseText = usePhraseText();
+  const text = phraseText(phrase);
   // Keyed on the phrase's identity rather than its text. Matching on text
   // lit up every tile sharing a string, and dropped the indicator halfway
   // through a phrase spoken in two languages.

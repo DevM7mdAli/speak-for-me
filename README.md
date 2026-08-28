@@ -1,138 +1,105 @@
 # Speak For Me
 
-Speak For Me is an ICU patient communication app built with Expo, React Native, and TypeScript. It helps patients who cannot speak, such as intubated, tracheostomy, ventilated, or post-surgery patients, communicate by tapping large bilingual phrase buttons and having the phone speak the selected phrase aloud.
+An ICU patient communication aid, and the site that explains it.
 
-The app is designed for stressful bedside use: no login, no onboarding, large touch targets, offline-first data, English and Arabic support, RTL layout handling, haptic feedback, and a one-tap emergency call button on the home screen.
+Speak For Me helps patients who cannot speak — intubated, tracheostomy, ventilated,
+post-surgical — communicate by tapping large bilingual phrase buttons that the phone
+speaks aloud and shows on screen. It works offline, has no account, and ships English
+and Arabic together.
 
-## Status
+**It is not a nurse-call system.** It speaks a phrase out loud on the device it is
+installed on. It does not alert staff or connect to hospital systems. See
+[the medical disclaimer](libs/content/src/legal.ts).
 
-Implemented in this codebase:
+## Layout
 
-- Home screen with an always-visible "Call the nurse" emergency button.
-- Category grid and category detail phrase grids.
-- Bilingual English/Arabic seed content for emergency, basic needs, pain/body, emotions, questions, and my words.
-- Offline local storage with `expo-sqlite`.
-- Repository interfaces for phrases and settings, so a cloud sync layer can be added later without rewriting screens.
-- Text-to-speech with `expo-speech`.
-- Haptic feedback with `expo-haptics`.
-- Language switching with i18next, Expo Localization, and React Native RTL reload handling.
-- Tajawal font loading for Arabic and Latin text.
-- Type/spell fallback screen with phrase suggestions and a persistent speak button.
-- Recently used and favorite phrases screen.
-- PIN-gated caregiver settings.
-- Settings for language, text size, high contrast mode, speech rate, voice selection, PIN changes, and reset.
-- Custom phrase editor (`/settings/edit-phrase`) with optional photo attachment via `expo-image-picker`; photos are copied into permanent app storage with `expo-file-system`.
+An Nx monorepo over pnpm workspaces. Nx runs and caches tasks; each project keeps its
+own tooling, so the Expo app's Metro, Jest and EAS setup is untouched by the workspace.
 
-## Tech Stack
+```text
+apps/
+  mobile/    Expo SDK 57 app — the thing patients use
+  web/       Next.js 16 + Tailwind 4 marketing and legal site
+libs/
+  brand/     Design tokens, lifted from the app's global.css
+  content/   Legal documents and landing copy, as typed data
+```
 
-- Expo SDK 57 managed workflow
-- React Native 0.86
-- React 19
-- TypeScript
-- Expo Router
-- Zustand
-- expo-sqlite
-- expo-speech
-- expo-haptics
-- expo-localization
-- expo-updates
-- expo-image and expo-image-picker
-- i18next and react-i18next
-- @expo-google-fonts/tajawal
-- @expo/vector-icons
+`libs/brand` exists so the site and the app cannot drift apart: the teal a nurse sees
+on the bedside phone is the teal on the marketing page. The web app consumes it today;
+the mobile app still owns its own `global.css` and is not yet wired to it.
 
-## Getting Started
+## Commands
 
-Install dependencies:
+From the repository root:
 
 ```bash
 pnpm install
 ```
 
-Start the Expo development server:
+```bash
+pnpm dev
+```
+
+Runs the website at <http://localhost:4200>.
 
 ```bash
-pnpm start
+pnpm test
 ```
 
-Run on a platform:
+Runs every project's tests. `pnpm typecheck`, `pnpm lint` and `pnpm build` work the
+same way, and `pnpm graph` opens the Nx project graph.
+
+To work on one project directly:
 
 ```bash
-pnpm ios
-pnpm android
-pnpm web
+pnpm mobile start
 ```
-
-Lint:
 
 ```bash
-pnpm lint
+pnpm web dev
 ```
 
-This project uses Expo SDK 57. When adding or changing Expo APIs, check the SDK 57 documentation first: <https://docs.expo.dev/versions/v57.0.0/>
+## apps/mobile
 
-## App Structure
+Expo SDK 57, React Native 0.86, expo-router, Zustand, expo-sqlite, uniwind.
 
-```text
-src/app/
-  _layout.tsx             App boot, fonts, settings hydration, RTL alignment
-  index.tsx               Home screen
-  category/[id].tsx       Phrase category detail screen
-  type-message.tsx        Free-text fallback speech screen
-  my-phrases.tsx          Recently used and favorite phrases
-  settings/
-    _layout.tsx           PIN gate for caregiver settings
-    index.tsx             Settings screen
-    edit-phrase.tsx       Add/edit custom phrases with optional photo
+The app is offline-first: SQLite on the device, seeded from a JSON file compiled into
+the bundle, which also serves as the fallback when the database will not open. Speech
+goes through the platform TTS engine, and every failure has a named next channel —
+audio, then full-screen text, then vibration.
 
-src/components/           Reusable accessible UI controls
-src/data/                 SQLite schema, models, seed data, repositories
-src/hooks/                Speech and settings hooks
-src/i18n/                 English/Arabic UI strings and i18next setup
-src/store/                Zustand phrase/settings stores
-src/theme/                Design tokens and theme helpers
+Tests cover the reliability paths rather than the UI: language switching, the speech
+sequencing contract, the seed's completeness and reachability, the schema and settings
+migrations, and PIN lockout.
+
+```bash
+pnpm mobile test
 ```
 
-## Data Layer
+When adding or changing Expo APIs, check the SDK 57 documentation first:
+<https://docs.expo.dev/versions/v57.0.0/>
 
-Screens and stores talk to repository interfaces instead of directly using SQLite:
+## apps/web
 
-- `PhraseRepository`
-- `SettingsRepository`
+Next.js 16 (App Router, Turbopack) with Tailwind CSS v4. Static — every route is
+prerendered, there is no database and no API.
 
-The current implementations are local-only:
+The design deliberately uses the mobile app's own palette and typeface rather than a
+separate marketing identity, and the landing page gives "what this is not" the same
+visual weight as a feature. For a safety-adjacent tool that is the first thing a
+clinical reader needs, not a footnote.
 
-- `LocalPhraseRepository`
-- `LocalSettingsRepository`
+## Status of the content
 
-SQLite is opened, migrated, and seeded in `src/data/database.ts`. Built-in bilingual seed content lives in `src/data/seed/phrases.en-ar.json`.
+Two things in this repository are drafts and are marked as such where they appear:
 
-The phrase model already includes future sync fields such as `syncStatus`, along with custom phrase fields such as `photoUri` and `isCustom`.
+- **The clinical phrase set** (`apps/mobile/src/data/seed/phrases.en-ar.json`) needs
+  review by a nurse or speech and language therapist. Its `_reviewNotes` field records
+  every judgement call made while drafting it, including the Arabic rewording.
+- **The legal documents** (`libs/content/src/legal.ts`) describe the app accurately and
+  are written from the source, but have not been reviewed by a lawyer.
 
-## Accessibility And ICU UX
+## Licence
 
-The app is built around the original ICU constraints:
-
-- Primary tap targets use an 88dp minimum through `MIN_TAP_TARGET`.
-- Phrase taps provide visual press state, haptic feedback, and spoken audio.
-- Emergency nurse call is reachable from home in one tap.
-- Core phrase speaking is at most two taps from home.
-- No login or onboarding blocks the patient.
-- Arabic and English content ship together.
-- Arabic selection forces RTL layout and reloads when needed.
-- High contrast and text scaling are available from settings.
-- Buttons and controls include accessibility roles and labels.
-
-## Languages
-
-Supported app languages:
-
-- English
-- Arabic
-
-Speech locales:
-
-- `en-US`
-- `ar-SA`
-
-Arabic mode uses RTL layout via `I18nManager` and reloads through `expo-updates` when the platform requires it.
+See [LICENSE](LICENSE).

@@ -1,0 +1,29 @@
+{
+  "name": "@speak-for-me/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 4200",
+    "build": "next build",
+    "start": "next start --port 4200",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@speak-for-me/brand": "workspace:*",
+    "@speak-for-me/content": "workspace:*",
+    "next": "16.3.3",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "~19.2.2",
+    "@types/react-dom": "~19.2.2",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "16.3.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~5.9.0"
+  }
+}

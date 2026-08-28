@@ -1,0 +1,112 @@
+@import 'tailwindcss';
+
+/*
+ * Tokens are the mobile app's own, from apps/mobile/src/global.css.
+ * The teal a nurse sees on the bedside phone is the teal on this page.
+ * Danger red means what it means in the app — urgency and limitation —
+ * and is never used as decoration.
+ */
+@theme {
+  --font-sans: 'Tajawal', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ground: #f2f6f5;
+  --color-surface: #ffffff;
+  --color-sunken: #e7efec;
+  --color-border: #afc6c0;
+  --color-hairline: #d3e0dc;
+  --color-ink: #102a27;
+  --color-muted: #4b6560;
+  --color-primary: #006c67;
+  --color-on-primary: #ffffff;
+  --color-primary-pressed: #00524e;
+  --color-danger: #c83331;
+  --color-on-danger: #ffffff;
+  --color-success: #087443;
+
+  --radius-control: 16px;
+  --radius-dialog: 24px;
+
+  --text-small: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lead: 1.25rem;
+  --text-h3: 1.5rem;
+  --text-h2: clamp(1.75rem, 1.4rem + 1.6vw, 2.25rem);
+  --text-h1: clamp(2.25rem, 1.6rem + 3vw, 3.4rem);
+  --text-hero: clamp(2.5rem, 1.7rem + 4vw, 4rem);
+}
+
+@layer theme {
+  :root {
+    color-scheme: light;
+  }
+
+  /* The app never follows the OS theme — a bay is bright by day and dark
+     at night regardless of what the phone thinks — but a web page has no
+     caregiver to ask, so here the reader's own preference decides. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --color-ground: #102421;
+      --color-surface: #17312e;
+      --color-sunken: #0b1a18;
+      --color-border: #7faaa0;
+      --color-hairline: #26433e;
+      --color-ink: #f2fbf8;
+      --color-muted: #c2d7d1;
+      --color-primary: #62d1c6;
+      --color-on-primary: #062725;
+      --color-primary-pressed: #42b8ad;
+      --color-danger: #ff8580;
+      --color-on-danger: #32110f;
+      --color-success: #76e0a8;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  /* Arabic samples sit inline in an otherwise LTR page. */
+  [dir='rtl'] {
+    text-align: right;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

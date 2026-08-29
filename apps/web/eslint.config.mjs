@@ -6,7 +6,7 @@ const config = [
   ...next,
   ...nextCoreWebVitals,
   {
-    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts'],
+    ignores: ['.next/**', 'out/**', 'node_modules/**', 'next-env.d.ts'],
   },
   {
     // Config files are required by their tooling to default-export a literal.

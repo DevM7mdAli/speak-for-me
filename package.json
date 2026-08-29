@@ -7,6 +7,7 @@
     "web": "pnpm --filter @speak-for-me/web",
     "dev": "nx run @speak-for-me/web:dev",
     "build": "nx run-many -t build",
+    "build:web": "nx run @speak-for-me/web:build",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",

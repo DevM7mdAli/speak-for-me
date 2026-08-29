@@ -64,10 +64,17 @@ const PRIVACY: LegalDocument = {
   needsReview: true,
   sections: [
     {
-      heading: 'What we collect',
+      heading: 'What the app collects',
       body: [
-        'Nothing. Speak For Me has no sign-up, no login, no account, and no server. It does not send analytics, crash reports, telemetry, or usage statistics anywhere.',
+        'Nothing. Speak For Me has no sign-up, no login, no account, and no server. The app sends no analytics, crash reports, telemetry, or usage statistics anywhere.',
         'Typed messages, spoken phrases, custom phrases and photos never leave the device they were created on.',
+      ],
+    },
+    {
+      heading: 'What this website collects',
+      body: [
+        'The app and this website are separate, and it would be misleading to let the paragraph above stand for both.',
+        'This website uses Cloudflare Web Analytics to count page views. It sets no cookies, does not fingerprint your browser or device, does not track you across other sites, and does not build a profile. It has no connection to the app: nothing a patient taps at a bedside is visible here, because the app never sends anything anywhere.',
       ],
     },
     {

@@ -1,99 +1,157 @@
 import Link from 'next/link';
-import { capabilities, emergencySamples, phraseSamples } from '@speak-for-me/content';
+import {
+  capabilities,
+  channels,
+  emergencySamples,
+  phraseSamples,
+} from '@speak-for-me/content';
 
+import { HeroStage } from './hero-stage';
+import { PhoneHome } from './phone';
 import { PhraseCard } from './phrase-card';
+
+/* Short phrases only: the hero sets them at display size, and a phrase
+   that wraps forces every other phrase to sit in its leftover space. */
+const heroPhrases = [
+  emergencySamples[0],
+  phraseSamples[0],
+  phraseSamples[1],
+  { en: 'I need water', ar: 'أحتاج ماء', tone: 'normal' as const },
+];
 
 export default function LandingPage() {
   return (
     <>
-      {/* Hero: what it does, in one sentence, next to the actual product
-          surface. No abstraction — the tiles below are the real tiles. */}
-      <section className="border-b border-hairline">
-        <div className="mx-auto grid max-w-6xl gap-14 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-28">
-          <div className="flex flex-col gap-7">
-            <h1 className="text-hero font-bold">
-              When a patient cannot speak, the phone speaks for them.
-            </h1>
-            <p className="max-w-[52ch] text-lead text-muted">
-              A bilingual communication aid for intubated, ventilated and post-surgical patients.
-              One tap says it out loud in English or Arabic — and puts it on screen large enough to
-              read from across the bay.
-            </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link
-                href="/#how"
-                className="rounded-control bg-primary px-7 py-4 font-bold text-on-primary transition-colors hover:bg-primary-pressed"
+      {/* The page opens as the app's fallback screen opens: the sentence,
+          at size, before anything explains itself. */}
+      <section className="night relative overflow-hidden">
+        <HeroStage phrases={heroPhrases}>
+          <h1 className="display max-w-[18ch] text-h2 font-bold">
+            Speak For Me gets the words out of the bed and into the room.
+          </h1>
+
+          <p className="max-w-[46ch] text-lead text-muted">
+            A bilingual communication aid for intubated, ventilated and post-surgical patients.
+            Works offline. No account, nothing to configure at the bedside.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="#channels"
+              className="rounded-control bg-white px-7 py-4 font-bold text-night transition-colors hover:bg-muted"
+            >
+              How it works
+            </Link>
+            <Link
+              href="#limits"
+              className="rounded-control border border-hairline px-7 py-4 font-medium text-muted transition-colors hover:border-ink hover:text-ink"
+            >
+              What it is not
+            </Link>
+          </div>
+        </HeroStage>
+      </section>
+
+      {/* A real sequence — each step is what happens when the one above it
+          fails — so it earns its numbering. */}
+      <section id="channels" className="scroll-mt-4 border-b border-hairline">
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 lg:py-32">
+          <h2 className="display max-w-[14ch] text-h1 font-bold">
+            Four ways to be heard, in the order they fail.
+          </h2>
+
+          <ol className="mt-16 flex flex-col">
+            {channels.map((channel, index) => (
+              <li
+                key={channel.step}
+                className={`reveal grid gap-x-10 gap-y-4 py-10 sm:grid-cols-[auto_1fr] lg:grid-cols-[7rem_22rem_1fr] ${
+                  index === 0 ? '' : 'border-t border-hairline'
+                }`}
               >
-                How it works
-              </Link>
+                <span className="display text-h2 font-bold text-primary tabular-nums">
+                  {channel.step}
+                </span>
+                <h3 className="display text-h3 font-bold">{channel.title}</h3>
+                <p className="max-w-[52ch] text-muted">{channel.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* The page's real risk: a limitation given more visual weight than
+          any feature. For a safety-adjacent tool it is what a clinical
+          reader needs first. */}
+      <section id="limits" className="scroll-mt-4 bg-accent text-white">
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 lg:py-36">
+          <h2 className="display max-w-[13ch] text-h1 font-bold">
+            This is not a nurse-call system.
+          </h2>
+          <div className="mt-12 grid gap-10 lg:grid-cols-2 lg:gap-20">
+            <p className="max-w-[52ch] text-lead">
+              The red buttons speak a phrase out loud through the phone&rsquo;s own speaker. They
+              do not alert staff, page anyone, or connect to any hospital system.{' '}
+              <span className="font-bold">If nobody is in the room, nobody is notified.</span>
+            </p>
+            <div className="flex max-w-[52ch] flex-col gap-6">
+              <p className="text-white/80">
+                Patients stay on the ward&rsquo;s own call system. Speak For Me is used alongside
+                it, never instead of it — and the app says so on the button itself.
+              </p>
               <Link
                 href="/legal/medical-disclaimer"
-                className="rounded-control border-2 border-border px-7 py-4 font-medium transition-colors hover:border-ink"
+                className="self-start border-b-2 border-white/60 pb-1 font-bold"
               >
-                What it is not
+                Read the full medical disclaimer
               </Link>
             </div>
-            <p className="text-small text-muted">
-              Works offline. No account, no sign-in, nothing to configure at the bedside.
-            </p>
-          </div>
-
-          <div
-            className="flex flex-col gap-3 rounded-dialog border border-hairline bg-sunken p-5"
-            aria-label="Example phrases from the app"
-          >
-            {emergencySamples.map((phrase) => (
-              <PhraseCard key={phrase.en} phrase={phrase} />
-            ))}
-            {phraseSamples.slice(0, 3).map((phrase) => (
-              <PhraseCard key={phrase.en} phrase={phrase} />
-            ))}
           </div>
         </div>
       </section>
 
-      {/* The page's one real risk: leading with a limitation, at the same
-          visual weight as a feature. For a safety-adjacent tool it is the
-          first thing a clinical reader needs, not a footnote. */}
-      <section className="border-b-2 border-danger bg-surface">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-16">
-            <h2 className="text-h1 font-bold text-danger">
-              This is not a nurse-call system.
-            </h2>
-            <div className="flex max-w-[60ch] flex-col gap-5 text-lead">
-              <p>
-                The red buttons speak a phrase out loud through the phone&rsquo;s own speaker. They
-                do not alert staff, page anyone, or connect to any hospital system. If nobody is in
-                the room, nobody is notified.
+      {/* Bilingual output, shown rather than claimed. */}
+      <section className="border-b border-hairline bg-sunken">
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 lg:py-32">
+          <div className="grid gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-24">
+            <div className="flex max-w-[46ch] flex-col gap-6">
+              <h2 className="display text-h2 font-bold">
+                The screen and the speaker can use different languages.
+              </h2>
+              <p className="text-lead text-muted">
+                A patient reading Arabic can have the phone speak English for the nurse on shift.
+                Or the reverse. Or both, one after the other.
               </p>
               <p className="text-muted">
-                The app says so on screen when speech fails, rather than leaving anyone to assume an
-                alert went out. Patients stay on the ward&rsquo;s own call system — Speak For Me is
-                used alongside it, never instead of it.
+                Speaking both is also a safety net: if one language has no voice installed, the
+                other still speaks — and the phrase is on screen in both either way.
               </p>
-              <p>
-                <Link
-                  href="/legal/medical-disclaimer"
-                  className="font-bold text-danger underline underline-offset-4"
-                >
-                  Read the full medical disclaimer
-                </Link>
-              </p>
+            </div>
+
+            <div className="reveal flex flex-col gap-4">
+              <div className="rounded-dialog border-2 border-border bg-surface p-8">
+                <p className="text-small font-medium text-muted">The patient reads</p>
+                <p dir="rtl" lang="ar" className="mt-4 text-h2 font-bold leading-[1.25]">
+                  الألم في صدري
+                </p>
+              </div>
+              <div className="rounded-dialog bg-primary p-8 text-on-primary">
+                <p className="text-small font-medium opacity-85">The room hears</p>
+                <p className="display mt-4 text-h2 font-bold">The pain is in my chest</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="how" className="scroll-mt-8 border-b border-hairline">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="max-w-[20ch] text-h1 font-bold">
+      <section className="border-b border-hairline">
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 lg:py-32">
+          <h2 className="display max-w-[16ch] text-h1 font-bold">
             Built for the moment nothing else is working.
           </h2>
-          <div className="mt-14 grid gap-x-14 gap-y-12 md:grid-cols-2">
+          <div className="mt-16 grid gap-x-16 gap-y-14 md:grid-cols-2">
             {capabilities.map((capability) => (
-              <div key={capability.title} className="flex max-w-[46ch] flex-col gap-3">
-                <h3 className="text-h3 font-bold">{capability.title}</h3>
+              <div key={capability.title} className="reveal flex max-w-[46ch] flex-col gap-4">
+                <h3 className="display text-h3 font-bold">{capability.title}</h3>
                 <p className="text-muted">{capability.body}</p>
               </div>
             ))}
@@ -101,81 +159,50 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* The dual-language capability, shown rather than described. */}
-      <section className="border-b border-hairline bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-center lg:gap-20">
-          <div className="flex max-w-[52ch] flex-col gap-5">
-            <h2 className="text-h1 font-bold">
-              The screen and the speaker can use different languages.
+      <section className="border-b border-hairline bg-sunken">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 sm:px-10 lg:grid-cols-[1fr_1fr] lg:gap-24 lg:py-32">
+          <div className="flex max-w-[46ch] flex-col gap-6">
+            <h2 className="display text-h1 font-bold">
+              Designed for weak hands and tired eyes.
             </h2>
             <p className="text-lead text-muted">
-              A patient reading Arabic can have the phone speak English for the nurse on shift. Or
-              the reverse. Or both, one after the other, with the caregiver choosing which leads.
+              Every primary control is at least 88dp. Text scales to 160%. Three themes, chosen by
+              a caregiver rather than followed from the operating system.
             </p>
             <p className="text-muted">
-              Speaking both is also a safety net: if one language has no voice installed on the
-              device, the other still speaks, and the phrase is on screen in both either way.
+              We are equally clear about the gaps: there is no switch scanning, eye-gaze or dwell
+              selection yet, so the app cannot serve a patient with no reliable touch at all.
             </p>
+            <Link
+              href="/legal/accessibility"
+              className="self-start border-b-2 border-primary pb-1 font-bold text-primary"
+            >
+              Read the accessibility statement
+            </Link>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <div className="rounded-control border-2 border-border bg-ground p-6">
-              <p className="text-small font-medium text-muted">The patient reads</p>
-              <p dir="rtl" lang="ar" className="mt-2 text-h2 font-bold">
-                الألم في صدري
-              </p>
-            </div>
-            <div className="rounded-control border-2 border-primary bg-primary p-6 text-on-primary">
-              <p className="text-small font-medium opacity-85">The room hears</p>
-              <p className="mt-2 text-h2 font-bold">The pain is in my chest</p>
-            </div>
+          <div className="reveal justify-self-center lg:justify-self-end">
+            <PhoneHome />
           </div>
         </div>
       </section>
 
-      <section className="border-b border-hairline">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-16">
-            <h2 className="text-h1 font-bold">Designed for weak hands and tired eyes.</h2>
-            <div className="flex max-w-[60ch] flex-col gap-5">
-              <p className="text-lead">
-                Every primary control is at least 88dp. Text scales to 160%. Three themes, chosen by
-                a caregiver rather than followed from the operating system, because a bay is bright
-                by day and dark at night.
-              </p>
-              <p className="text-muted">
-                We are equally clear about what is missing: there is no switch scanning, eye-gaze or
-                dwell selection yet, so the app cannot serve a patient with no reliable touch at all.
-              </p>
-              <p>
-                <Link
-                  href="/legal/accessibility"
-                  className="font-bold text-primary underline underline-offset-4"
-                >
-                  Read the accessibility statement
-                </Link>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="flex max-w-[54ch] flex-col gap-5">
-            <h2 className="text-h1 font-bold">Free, open source, and collects nothing.</h2>
-            <p className="text-lead text-muted">
-              There is no account to create and no server to send anything to. The database lives on
-              the device and is gone when the app is uninstalled.
+      <section className="night">
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 lg:py-36">
+          <h2 className="display max-w-[18ch] text-h1 font-bold">
+            Free, open source, and it collects nothing.
+          </h2>
+          <div className="mt-10 grid gap-10 lg:grid-cols-2 lg:gap-20">
+            <p className="max-w-[50ch] text-lead text-muted">
+              No account to create, no server to send anything to. The database lives on the device
+              and is gone when the app is uninstalled.
             </p>
-            <p>
-              <Link
-                href="/legal/privacy"
-                className="font-bold text-primary underline underline-offset-4"
-              >
-                Read the privacy policy
-              </Link>
-            </p>
+            <Link
+              href="/legal/privacy"
+              className="self-start border-b-2 border-primary pb-1 font-bold text-primary"
+            >
+              Read the privacy policy
+            </Link>
           </div>
         </div>
       </section>

@@ -1,71 +1,73 @@
 @import 'tailwindcss';
 
 /*
- * Tokens are the mobile app's own, from apps/mobile/src/global.css.
- * The teal a nurse sees on the bedside phone is the teal on this page.
- * Danger red means what it means in the app — urgency and limitation —
- * and is never used as decoration.
+ * Colours are the mobile app's own, from apps/mobile/src/global.css — the
+ * teal a nurse sees on the bedside phone is the teal on this page. The
+ * page uses the app's *dark* tokens for its opening and its light tokens
+ * below, because that tonal shift is the product: a darkened bay at 3am,
+ * a bright ward by day.
  */
 @theme {
-  --font-sans: 'Tajawal', ui-sans-serif, system-ui, sans-serif;
+  /* One family, matching the app. Tajawal carries Arabic and Latin, which
+     is why the app chose it and why the page needs it for the bilingual
+     phrases to set correctly. */
+  --font-sans: var(--font-tajawal), ui-sans-serif, system-ui, sans-serif;
 
+  /* Light — the app's light theme. */
   --color-ground: #f2f6f5;
   --color-surface: #ffffff;
-  --color-sunken: #e7efec;
+  --color-sunken: #e6efec;
   --color-border: #afc6c0;
   --color-hairline: #d3e0dc;
   --color-ink: #102a27;
   --color-muted: #4b6560;
   --color-primary: #006c67;
   --color-on-primary: #ffffff;
-  --color-primary-pressed: #00524e;
   --color-danger: #c83331;
   --color-on-danger: #ffffff;
-  --color-success: #087443;
+  /* The icon's dot. Warmer than the UI danger red, and used as an accent
+     rather than only as a warning. */
+  --color-accent: #d9433d;
+
+  /* Brand — taken from the app icon rather than the UI tokens. The mark
+     is a white speech bubble with a voice waveform and a coral dot on a
+     deep teal ground, so those are the page's two colours. The mint in
+     the app's dark theme is a legibility token for a bedside screen, not
+     an identity, and using it as the dominant colour read as unrelated
+     to the product. */
+  --color-brand: #006c67;
+  --color-coral: #e45a55;
+
+  /* Deep enough to carry white display type comfortably, still
+     unmistakably the icon's teal. */
+  --color-night: #00423f;
+  --color-night-surface: #005550;
+  --color-night-hairline: #1a6560;
+  --color-night-ink: #ffffff;
+  --color-night-muted: #a8ccc8;
+  --color-night-primary: #ffffff;
+  --color-night-danger: #ff8f8a;
 
   --radius-control: 16px;
   --radius-dialog: 24px;
 
+  --text-micro: 0.8125rem;
   --text-small: 0.9375rem;
   --text-base: 1.0625rem;
-  --text-lead: 1.25rem;
-  --text-h3: 1.5rem;
-  --text-h2: clamp(1.75rem, 1.4rem + 1.6vw, 2.25rem);
-  --text-h1: clamp(2.25rem, 1.6rem + 3vw, 3.4rem);
-  --text-hero: clamp(2.5rem, 1.7rem + 4vw, 4rem);
-}
-
-@layer theme {
-  :root {
-    color-scheme: light;
-  }
-
-  /* The app never follows the OS theme — a bay is bright by day and dark
-     at night regardless of what the phone thinks — but a web page has no
-     caregiver to ask, so here the reader's own preference decides. */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      color-scheme: dark;
-      --color-ground: #102421;
-      --color-surface: #17312e;
-      --color-sunken: #0b1a18;
-      --color-border: #7faaa0;
-      --color-hairline: #26433e;
-      --color-ink: #f2fbf8;
-      --color-muted: #c2d7d1;
-      --color-primary: #62d1c6;
-      --color-on-primary: #062725;
-      --color-primary-pressed: #42b8ad;
-      --color-danger: #ff8580;
-      --color-on-danger: #32110f;
-      --color-success: #76e0a8;
-    }
-  }
+  --text-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --text-h3: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  --text-h2: clamp(2rem, 1.5rem + 2.4vw, 3.25rem);
+  --text-h1: clamp(2.25rem, 1.4rem + 3.2vw, 4rem);
+  /* The hero phrase. Deliberately larger than anything else on the page —
+     it is a reproduction of the app's full-screen fallback, which exists
+     to be read from across a room. */
+  --text-phrase: clamp(2.25rem, 0.9rem + 4.4vw, 5.25rem);
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -75,19 +77,20 @@
     font-size: var(--text-base);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   h1,
   h2,
   h3 {
     text-wrap: balance;
-    letter-spacing: -0.015em;
-    line-height: 1.15;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-primary);
-    outline-offset: 3px;
+    outline: 3px solid currentColor;
+    outline-offset: 4px;
     border-radius: 4px;
   }
 
@@ -95,18 +98,79 @@
     background: var(--color-primary);
     color: var(--color-on-primary);
   }
+}
 
-  /* Arabic samples sit inline in an otherwise LTR page. */
-  [dir='rtl'] {
-    text-align: right;
+/* Headings are separated from body text by weight and tracking rather
+   than by a second family — Tajawal is geometric enough that bold, tight
+   and large reads as display without changing typeface. */
+@utility display {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+/* A band that carries the app's night theme, inverting every token inside
+   it so children can keep using the same class names. */
+@utility night {
+  background: var(--color-night);
+  color: var(--color-night-ink);
+  --color-ground: var(--color-night);
+  --color-surface: var(--color-night-surface);
+  --color-hairline: var(--color-night-hairline);
+  --color-ink: var(--color-night-ink);
+  --color-muted: var(--color-night-muted);
+  --color-primary: var(--color-night-primary);
+  --color-danger: var(--color-night-danger);
+  --color-border: var(--color-night-hairline);
+}
+
+@layer components {
+  /* One orchestrated moment, not scattered effects: the hero phrase
+     arrives the way the app's fallback screen does — at once, at size. */
+  .phrase-enter {
+    animation: phrase-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes phrase-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.1em, 0);
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  .reveal {
+    animation: reveal 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-timeline: view();
+    animation-range: entry 5% cover 26%;
+  }
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 26px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+  html {
+    scroll-behavior: auto;
+  }
+
+  .phrase-enter,
+  .reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 }

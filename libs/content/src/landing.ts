@@ -44,3 +44,33 @@ export const capabilities: Capability[] = [
       'When speech does not play, the phrase fills the screen and an emergency vibrates. The app says plainly that no alert was sent rather than leaving anyone to assume one was.',
   },
 ];
+
+/** The degradation order, which is a real sequence: each step is what happens when the one above it fails. */
+export interface Channel {
+  step: string;
+  title: string;
+  body: string;
+}
+
+export const channels: Channel[] = [
+  {
+    step: '01',
+    title: 'It speaks',
+    body: 'One tap sends the phrase to the device’s own voice, in English or Arabic, at a speed the caregiver sets. A haptic pulse confirms the tap even when the room is loud.',
+  },
+  {
+    step: '02',
+    title: 'If nobody hears it, the screen says it',
+    body: 'The phrase fills the display at the size you see above, for as long as it is being spoken. Audio is for the room. The screen is for the person facing the other way.',
+  },
+  {
+    step: '03',
+    title: 'If the phone is silent, it shakes',
+    body: 'An emergency phrase that produces no sound vibrates and turns the screen red. The app states plainly that no alert was sent, rather than letting anyone assume one was.',
+  },
+  {
+    step: '04',
+    title: 'If the app itself breaks, four buttons still work',
+    body: 'Call the nurse, I can’t breathe, yes, and no are read from a file compiled into the app. They survive a corrupt database, a failed migration and a crashed screen.',
+  },
+];

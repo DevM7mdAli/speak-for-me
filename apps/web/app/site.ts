@@ -13,7 +13,7 @@
  * production URL as canonical.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://icu.mohammed-alajmi.me'
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://icu.mohammed.win'
 ).replace(/\/$/, '');
 
 export const SITE_NAME = 'Speak For Me';

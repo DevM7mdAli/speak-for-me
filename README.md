@@ -14,7 +14,7 @@ installed on. It does not alert staff or connect to hospital systems. See
 ## Layout
 
 An Nx monorepo over pnpm workspaces. Nx runs and caches tasks; each project keeps its
-own tooling, so the Expo app's Metro, Jest and EAS setup is untouched by the workspace.
+own tooling, so the Expo app's Metro, Jest and native build setup is untouched by the workspace.
 
 ```text
 apps/
@@ -76,6 +76,10 @@ migrations, and PIN lockout.
 ```bash
 pnpm mobile test
 ```
+
+Store releases are built locally, without EAS. [apps/mobile/RELEASING.md](apps/mobile/RELEASING.md)
+has the one-time setup wizard, the per-release steps for Google Play and the App
+Store, and the listing checklist.
 
 When adding or changing Expo APIs, check the SDK 57 documentation first:
 <https://docs.expo.dev/versions/v57.0.0/>

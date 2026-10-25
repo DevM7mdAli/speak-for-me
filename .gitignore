@@ -49,3 +49,22 @@ out/
 
 # Nx
 .nx/
+
+# Store release credentials — never commit (see apps/mobile/RELEASING.md)
+apps/mobile/credentials/
+keystore.properties
+*.keystore
+!apps/mobile/android/app/debug.keystore
+AuthKey_*.p8
+*service-account*.json
+.env
+.env.*
+!.env.example
+.xcode.env.local
+
+# Store build outputs
+*.aab
+*.apk
+*.ipa
+*.xcarchive
+ExportOptions.plist

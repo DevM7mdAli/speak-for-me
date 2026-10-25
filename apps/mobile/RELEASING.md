@@ -1,10 +1,13 @@
 # Releasing Speak For Me to the stores
 
-Both store builds are made on a Mac in this repository. There is no EAS
-account, cloud build or `eas-cli` involved.
+Store builds are made with EAS (project `@devm7mdali/speak-for-me`, profiles in
+`eas.json`). The local Xcode and Gradle scripts further down stay as a fallback
+for when EAS is unavailable.
 
-- `app.json` is the source of truth: version numbers, identifiers, permissions,
-  icons and the signing plugin all live there.
+- `app.json` is the source of truth for identifiers, permissions, icons and the
+  config plugins. On EAS, build numbers are kept by EAS (`appVersionSource:
+  remote`) and bumped on every production build; `expo.ios.buildNumber` and
+  `expo.android.versionCode` in `app.json` only matter for the local scripts.
 - `android/` and `ios/` are committed, but they are generated. Every release
   script regenerates them with `expo prebuild --clean` and you commit the
   result, so the repository matches what shipped.
@@ -22,7 +25,50 @@ account, cloud build or `eas-cli` involved.
 | `scripts/release-android.sh` | Builds `android/app/build/outputs/bundle/release/app-release.aab` |
 | `scripts/release-ios.sh` | Builds `ios/build/SpeakForMe.xcarchive` and an `.ipa` |
 
-## One-time setup
+## Releasing with EAS
+
+Run these from `apps/mobile`. EAS keeps the signing credentials on its servers:
+the iOS distribution certificate and profile, the Android keystore (which
+becomes the Play upload key on the first upload), and, once you add it, the
+Google Play service account key. None of them belong in this repository.
+
+### One-time setup
+
+1. **Apple.** A paid Apple Developer Program membership is required; a free
+   Personal Team cannot upload. The first iOS build is interactive: EAS asks
+   for the Apple ID, then creates the distribution certificate, the
+   provisioning profile and, on submit, the App Store Connect app record.
+   ```bash
+   npx eas-cli@latest build -p ios --profile production --auto-submit
+   ```
+2. **Google Play.** Create the developer account and the app (wizard stage 5
+   below lists the Play Console answers). Google's API cannot create an app,
+   so the **first** bundle must be uploaded by hand: download the `.aab` from
+   the EAS build page, then Play Console → Testing → Internal testing → Create
+   new release → upload. After that, create a Google Cloud service account
+   with Play Console access, download its JSON key and store it in EAS with
+   `npx eas-cli@latest credentials -p android` → Google Service Account. Keep
+   the JSON out of the repository and delete the downloaded copy.
+
+### Every release
+
+```bash
+npx eas-cli@latest build -p android --profile production --auto-submit
+npx eas-cli@latest build -p ios --profile production --auto-submit
+```
+
+Android goes to the Play internal testing track (`submit.production` in
+`eas.json`); iOS goes to App Store Connect and appears in TestFlight once Apple
+has processed it. Promote from there to production in each console.
+
+## Local builds (fallback)
+
+The local scripts sign Android with `credentials/android/upload-keystore.jks`.
+Once EAS has uploaded to Play, that has to be the same key EAS holds:
+`npx eas-cli@latest credentials -p android` → Download keystore, then put it in
+`credentials/android/` instead of generating a new one in stage 4.
+
+### One-time setup
 
 ```bash
 pnpm mobile release:setup
@@ -42,7 +88,7 @@ For CI, the same four values can come from the environment instead of the
 properties file: `ANDROID_UPLOAD_STORE_FILE`, `ANDROID_UPLOAD_STORE_PASSWORD`,
 `ANDROID_UPLOAD_KEY_ALIAS`, `ANDROID_UPLOAD_KEY_PASSWORD`.
 
-## Every release
+### Every release
 
 1. **Bump the numbers in `app.json`.**
    - `expo.version` is what users see (`1.1.0`). Use it for both platforms.

@@ -74,7 +74,25 @@ describe('addReleaseSigning', () => {
   it('fails every release task, naming the next step, when no key is configured', () => {
     expect(output).toContain('/(assemble|bundle|package|install)Release/');
     expect(output).toContain("pnpm mobile release:setup");
+    expect(output).toContain("eas credentials -p android");
     expect(output).toContain('throw new GradleException');
+  });
+
+  it('hands signing to EAS Build only once EAS has written credentials.json', () => {
+    const lookup = output.slice(output.indexOf('def speakForMeUploadKey'), output.indexOf('}()'));
+    const eas = lookup.indexOf("env['EAS_BUILD_WORKINGDIR']");
+    expect(eas).toBeGreaterThan(-1);
+    expect(eas).toBeLessThan(lookup.indexOf("env['ANDROID_UPLOAD_STORE_FILE']"));
+    expect(lookup).toContain("new File(env['EAS_BUILD_WORKINGDIR'], 'credentials.json')");
+    // No credentials.json on EAS → null → the release guard fails the build.
+    expect(lookup).toMatch(/if \(!easCredentials\.isFile\(\)\) \{\n\s+return null/);
+    expect(lookup).toContain('managedByEas: true');
+  });
+
+  it('leaves the release signing config for EAS to fill instead of overriding it', () => {
+    const signingConfigs = output.slice(output.indexOf('signingConfigs {'), output.indexOf('buildTypes {'));
+    expect(signingConfigs).toContain('if (speakForMeUploadKey && !speakForMeUploadKey.managedByEas) {');
+    expect(output).toContain('if (speakForMeUploadKey && !speakForMeUploadKey.managedByEas) {\n    [');
   });
 
   it('is idempotent, so prebuild can run again on a committed native project', () => {

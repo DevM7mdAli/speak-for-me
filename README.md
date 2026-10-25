@@ -77,9 +77,9 @@ migrations, and PIN lockout.
 pnpm mobile test
 ```
 
-Store releases are built locally, without EAS. [apps/mobile/RELEASING.md](apps/mobile/RELEASING.md)
-has the one-time setup wizard, the per-release steps for Google Play and the App
-Store, and the listing checklist.
+Store releases are built and submitted with EAS, with local Xcode/Gradle scripts as a
+fallback. [apps/mobile/RELEASING.md](apps/mobile/RELEASING.md) has the one-time setup,
+the per-release steps for Google Play and the App Store, and the listing checklist.
 
 When adding or changing Expo APIs, check the SDK 57 documentation first:
 <https://docs.expo.dev/versions/v57.0.0/>

@@ -52,6 +52,7 @@ out/
 
 # Store release credentials — never commit (see apps/mobile/RELEASING.md)
 apps/mobile/credentials/
+credentials.json
 keystore.properties
 *.keystore
 !apps/mobile/android/app/debug.keystore

@@ -5,7 +5,9 @@
 // rejects such bundles, and a debug-signed release is the kind of silent failure
 // this app must not have. This plugin rewrites the generated file so that:
 //
-//   - a release signing config reads the upload key from, in order,
+//   - on EAS Build, the release is left to EAS, which signs it with the upload
+//     key it stores once it has written credentials.json to the build directory;
+//   - otherwise a release signing config reads the upload key from, in order,
 //     ANDROID_UPLOAD_* environment variables (CI) or
 //     apps/mobile/credentials/android/keystore.properties (a developer's Mac);
 //   - the release build type uses that config;
@@ -28,6 +30,15 @@ const SIGNING_END = '        // <<< speak-for-me release signing config';
 const HEADER_BLOCK = `${HEADER_BEGIN}
 def speakForMeUploadKey = { ->
     def env = System.getenv()
+    if (env['EAS_BUILD_WORKINGDIR']) {
+        // EAS applies eas-build-inject-android-credentials.gradle, which signs the
+        // release from this file. No file means EAS has no key: fail below.
+        def easCredentials = new File(env['EAS_BUILD_WORKINGDIR'], 'credentials.json')
+        if (!easCredentials.isFile()) {
+            return null
+        }
+        return [managedByEas: true, source: easCredentials.absolutePath]
+    }
     if (env['ANDROID_UPLOAD_STORE_FILE']) {
         return [
             storeFile: env['ANDROID_UPLOAD_STORE_FILE'],
@@ -55,7 +66,7 @@ def speakForMeUploadKey = { ->
     ]
 }()
 
-if (speakForMeUploadKey) {
+if (speakForMeUploadKey && !speakForMeUploadKey.managedByEas) {
     ['storeFile', 'storePassword', 'keyAlias', 'keyPassword'].each { key ->
         if (!speakForMeUploadKey[key]) {
             throw new GradleException("Speak For Me release signing: '\${key}' is missing from \${speakForMeUploadKey.source}. See apps/mobile/RELEASING.md.")
@@ -79,7 +90,8 @@ gradle.taskGraph.whenReady { graph ->
         throw new GradleException(
             'Speak For Me release signing: no upload key is configured, so this release build would be signed ' +
             'with the public debug key and Google Play would reject it.\\n' +
-            "  Next step: run 'pnpm mobile release:setup' to create credentials/android/keystore.properties, " +
+            "  Next step: on EAS Build, run 'eas credentials -p android' to give the project a keystore; " +
+            "locally, run 'pnpm mobile release:setup' to create credentials/android/keystore.properties, " +
             'or export ANDROID_UPLOAD_STORE_FILE, ANDROID_UPLOAD_STORE_PASSWORD, ANDROID_UPLOAD_KEY_ALIAS ' +
             'and ANDROID_UPLOAD_KEY_PASSWORD. See apps/mobile/RELEASING.md.'
         )
@@ -89,7 +101,7 @@ ${HEADER_END}`;
 
 const SIGNING_BLOCK = `${SIGNING_BEGIN}
         release {
-            if (speakForMeUploadKey) {
+            if (speakForMeUploadKey && !speakForMeUploadKey.managedByEas) {
                 storeFile speakForMeUploadKey.resolvedStoreFile
                 storePassword speakForMeUploadKey.storePassword
                 keyAlias speakForMeUploadKey.keyAlias
